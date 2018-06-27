@@ -1,18 +1,24 @@
-Sparta examples
+Sparta examples for developers.
+============
+
+Workflows
+------------
 
 
-	# Workflows
+Plugins
+------------
+
+	- Input: DummyGenerator
+	- Transformation: Repartition
+	- Output: Logger
 
 
-	# Plugins
+SDK libraries
+------------
 		
-		- Input: DummyGenerator
-		- Transformation: Repartition
-		- Output: Logger
+	- sdk-lite-2.1.0-SNAPSHOT
+	- sdk-lite-xd-2.1.0-SNAPSHOT
 
-	# SDK libraries
-		
-		- sdk-lite-2.1.0-SNAPSHOT
-		- sdk-lite-xd-2.1.0-SNAPSHOT
 
-	# Docker
+Docker
+------------
