@@ -16,8 +16,8 @@ Plugins
 SDK libraries
 ------------
 		
-	- sdk-lite-2.1.0-SNAPSHOT
-	- sdk-lite-xd-2.1.0-SNAPSHOT
+	- sdk-lite-2.2.0-8b6b349
+	- sdk-lite-xd-2.2.0-8b6b349
 
 
 Docker
