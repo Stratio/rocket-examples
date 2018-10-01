@@ -5,12 +5,9 @@
  */
 package com.stratio.sparta
 
-import org.apache.spark.rdd.RDD
 import com.stratio.sparta.sdk.lite.common._
-import com.stratio.sparta.sdk.lite.common
-import scala.util.Try
+import com.stratio.sparta.sdk.lite.common.models.OutputOptions
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
 
 class LoggerLiteOutputStep(
                               sparkSession: SparkSession,
@@ -18,9 +15,13 @@ class LoggerLiteOutputStep(
                             )
   extends LiteCustomOutput(sparkSession, properties) {
 
-  override def save(data: DataFrame, saveMode: String, saveOptions: Map[String, String]): Unit = {
+
+  override def save(data: DataFrame, outputOptions: OutputOptions): Unit = {
     data.foreach{ row =>
       println(row.mkString(","))
     }
   }
+
+  override def save(data: DataFrame, saveMode: String, saveOptions: Map[String, String]): Unit = ()
+
 }
