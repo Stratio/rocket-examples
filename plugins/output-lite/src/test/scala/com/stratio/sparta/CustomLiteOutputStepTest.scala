@@ -15,7 +15,8 @@ import org.scalatest.junit.JUnitRunner
 
 
 @RunWith(classOf[JUnitRunner])
-class CustomLiteOutputStepIT extends FlatSpec with Matchers with BeforeAndAfterAll {
+class CustomLiteOutputStepTests
+  extends FlatSpec with Matchers with BeforeAndAfterAll {
 
   val sc = SparkContext.getOrCreate(new SparkConf().setAppName("test").setMaster("local[1]"))
   val xdSession: XDSession = XDSession.builder().config(sc.getConf).create("dummyUser")
