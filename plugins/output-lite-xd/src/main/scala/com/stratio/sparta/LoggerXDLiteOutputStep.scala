@@ -5,23 +5,24 @@
  */
 package com.stratio.sparta
 
-import org.apache.spark.rdd.RDD
+import com.stratio.sparta.sdk.lite.common.models.OutputOptions
 import com.stratio.sparta.sdk.lite.xd.common._
-import com.stratio.sparta.sdk.lite.xd.common
-import scala.util.Try
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.crossdata.XDSession
 
 class LoggerXDLiteOutputStep(
-                            xdSession: XDSession,
-                            properties: Map[String, String]
+                              xdSession: XDSession,
+                              properties: Map[String, String]
                             )
   extends LiteCustomXDOutput(xdSession, properties) {
 
-  override def save(data: DataFrame, saveMode: String, saveOptions: Map[String, String]): Unit = {
+  override def save(data: DataFrame, outputOptions: OutputOptions): Unit = {
     data.foreach{ row =>
       println(row.mkString(","))
     }
   }
+
+  override def save(data: DataFrame, saveMode: String, saveOptions: Map[String, String]): Unit = ()
+
+
 }

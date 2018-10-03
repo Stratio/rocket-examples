@@ -14,14 +14,15 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <scala.binary.version>2.11</scala.binary.version>
         <apache.spark.version>2.2.0</apache.spark.version>
-        <crossdata.version>2.13.0-fa5ad1b</crossdata.version>
+        <crossdata.version>2.14.0-M1</crossdata.version>
+        <sparta.version>2.4.0-SNAPSHOT</sparta.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.stratio.sparta</groupId>
             <artifactId>sdk-lite-xd</artifactId>
-            <version>2.2.0-8b6b349</version>
+            <version>${sparta.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
