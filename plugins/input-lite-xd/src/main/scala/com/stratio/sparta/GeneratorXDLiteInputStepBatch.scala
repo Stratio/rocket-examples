@@ -5,26 +5,40 @@
  */
 package com.stratio.sparta
 
-import org.apache.spark.sql._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions._
-import com.stratio.sparta.sdk.lite.xd.batch._
 import com.stratio.sparta.sdk.lite.batch.models._
-
-import scala.util.{Failure, Success, Try}
+import com.stratio.sparta.sdk.lite.validation.ValidationResult
+import com.stratio.sparta.sdk.lite.xd.batch._
+import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.crossdata.XDSession
 import org.apache.spark.sql.types._
 
-import scala.util.Try
-
-class GeneratorLiteInputStepBatch(
+class GeneratorXDLiteInputStepBatch(
                                    xdSession: XDSession,
                                    properties: Map[String, String]
                                  )
   extends LiteCustomXDBatchInput(xdSession, properties) {
 
   lazy val stringSchema = StructType(Seq(StructField("raw", StringType)))
+  lazy val rawData: Option[String] = properties.get("raw").map(_.toString)
+
+
+  override def validate(): ValidationResult = {
+    var validation = ValidationResult(valid = true, messages = Seq.empty)
+
+    if (rawData.isEmpty) {
+      validation = ValidationResult(
+        valid = false,
+        messages = validation.messages :+ "Test data must be set inside the Option properties with an option key named 'raw'")
+    }
+
+    if (rawData.map(_.trim).forall(_.isEmpty)) {
+      validation = ValidationResult(
+        valid = false,
+        messages = validation.messages :+ "Generated data cannot be an empty string")
+    }
+    validation
+  }
 
   override def init(): ResultBatchData = {
     val register = Seq(new GenericRowWithSchema(Array("test-data"), stringSchema).asInstanceOf[Row])
