@@ -56,9 +56,9 @@ List of values used in the Writer tab:
 |     Unique Constraint Fields     |      uniqueConstraintFields      |
 |           Update fields          |           updateFields           |
 ```
-Custom output plugin use the list above to configure the save function which will treat the outgoing data, this parameters can be accessed like this:
+Custom output plugin use the list above to configure the save function to be implemented, which will treat the outgoing data. This parameters can be accessed like this:
 ```scala
-/* outputOptions: OutputOptions
+/* outputOptions: OutputOptions */
 val tableName = outputOptions.tableName.getOrElse{
       logger.error("Table name not defined")
       throw new NoSuchElementException("tableName not found in options")}
@@ -75,7 +75,9 @@ In the `transformation-lite-xd` module you will find an example on how to develo
     result.size shouldBe 2
   }
 ```
-## Generating your custom JAR and uploading it
+## Generating your JAR and uploading it
+Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of our project. You can later upload this JAR using the Sparta UI 
+
 
 ## Deployment
 Add additional notes about how to deploy this on a live system
