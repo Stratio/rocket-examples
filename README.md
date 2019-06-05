@@ -46,7 +46,16 @@ An example on how to access this data from any input, transformation or output c
     case None => None
   }
 ```
-List of values used in the Writer tab:
+
+Also, custom output plugins use the writer fields to configure the save function to be implemented, which will treat the outgoing data. These parameters can be accessed as follows:
+```scala
+/* outputOptions: OutputOptions */
+val tableName = outputOptions.tableName.getOrElse{
+      logger.error("Table name not defined")
+      throw new NoSuchElementException("tableName not found in options")}
+```
+
+List of accesible values from the Writer tab:
 ```
 | Name as it appears on the screen | Name as retrieved by the backend |
 |:--------------------------------:|:--------------------------------:|
@@ -57,13 +66,7 @@ List of values used in the Writer tab:
 |     Unique Constraint Fields     |      uniqueConstraintFields      |
 |           Update fields          |           updateFields           |
 ```
-Custom output plugin use the list above to configure the save function to be implemented, which will treat the outgoing data. This parameters can be accessed like this:
-```scala
-/* outputOptions: OutputOptions */
-val tableName = outputOptions.tableName.getOrElse{
-      logger.error("Table name not defined")
-      throw new NoSuchElementException("tableName not found in options")}
-```
+
 
 ### Running the tests
 
@@ -78,10 +81,14 @@ In the `transformation-lite-xd` module you will find an example on how to develo
 ```
 ## Generating your JAR and uploading it
 Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of our project. You can later upload this JAR using the Sparta UI 
+![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958966-56134300-87a4-11e9-8f8b-16ac927375b4.png?raw=true)
 
+Later, you must make sure that in the workflow setting the option for 'Add uploaded plugins' is marked. This option will allow the workflow to access all the JARs uploaded in the Plugin repository.
+![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958963-557aac80-87a4-11e9-8e03-294620b80c5b.png?raw=true)
 
-## Deployment
-Add additional notes about how to deploy this on a live system
+Lastly, you will only need to add the matching custom box to your workflow and specify the name of your plugin class. Which of course must be contained in the JAR uploaded.
+![addCustom](https://user-images.githubusercontent.com/7203924/58958964-56134300-87a4-11e9-910c-e33c57d266f7.png?raw=true)
+![addCustom](https://user-images.githubusercontent.com/7203924/58958961-557aac80-87a4-11e9-8147-4d763e0bdec2.png?raw=true)
 
 ## Built With
 * [Maven](https://maven.apache.org/) - Dependency Management
