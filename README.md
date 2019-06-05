@@ -80,7 +80,7 @@ In the `transformation-lite-xd` module you will find an example on how to develo
   }
 ```
 ## Generating your JAR and uploading it
-Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of our project. You can later upload this JAR using the Sparta UI 
+Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of our project. You can later upload this JAR using the Sparta UI. All the JARs in this repository are stored in HDFS.
 ![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958966-56134300-87a4-11e9-8f8b-16ac927375b4.png?raw=true)
 
 Later, you must make sure that in the workflow setting the option for 'Add uploaded plugins' is marked. This option will allow the workflow to access all the JARs uploaded in the Plugin repository.
@@ -90,6 +90,30 @@ Lastly, you will only need to add the matching custom box to your workflow and s
 ![addCustom](https://user-images.githubusercontent.com/7203924/58958964-56134300-87a4-11e9-910c-e33c57d266f7.png?raw=true)
 ![addCustom](https://user-images.githubusercontent.com/7203924/58958961-557aac80-87a4-11e9-8147-4d763e0bdec2.png?raw=true)
 
+## UDFs and UDAFs integration
+Stratio Sparta broadens the utilities available for you in this release in order to add versatility to workflow development. Now UDF’s and UDAF’s are fully integrated into the SDK.
+
+You will only need to extend the traits found in the sdk-lite package in order to start developing your own.
+
+Here’s a simple example of a UDF developed by extending the trait SpartaUDF.
+```scala
+case class ToUpperCaseUDF() extends SpartaUDF {
+
+  val name = "uppercaseSparta"
+
+  val upper: String => String = _.toUpperCase
+
+  val userDefinedFunction: UserDefinedFunction =
+    UserDefinedFunction(upper , StringType, Option(Seq(StringType)))
+}
+```
+After getting this done, it will be necessary to first upload the JAR with the same procedure explained above and then register it through the workflow settings
+![addCustom](https://user-images.githubusercontent.com/7203924/58958967-56134300-87a4-11e9-824a-6f360da0c455.png?raw=true)
+
+Lastly, in order to use the newly registered UDF you just need to call it in a Trigger transformation and pass it some valid value.
+![UDFUsage]https://user-images.githubusercontent.com/7203924/58961479-827d8e00-87a9-11e9-90f3-c0974068dc9b.png
+
 ## Built With
 * [Maven](https://maven.apache.org/) - Dependency Management
+
 
