@@ -111,9 +111,11 @@ After getting this done, it will be necessary to first upload the JAR with the s
 ![addCustom](https://user-images.githubusercontent.com/7203924/58958967-56134300-87a4-11e9-824a-6f360da0c455.png?raw=true)
 
 Lastly, in order to use the newly registered UDF you just need to call it in a Trigger transformation and pass it some valid value.
-![UDFUsage]https://user-images.githubusercontent.com/7203924/58961479-827d8e00-87a9-11e9-90f3-c0974068dc9b.png
+![UDFUsage](https://user-images.githubusercontent.com/7203924/58961479-827d8e00-87a9-11e9-90f3-c0974068dc9b.png?raw=true)
 
 ## Built With
 * [Maven](https://maven.apache.org/) - Dependency Management
+
+
 
 
