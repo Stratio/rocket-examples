@@ -58,6 +58,7 @@ List of values used in the Writer tab:
 ```
 Custom output plugin use the list above to configure the save function which will treat the outgoing data, this parameters can be accessed like this:
 ```scala
+/* outputOptions: OutputOptions
 val tableName = outputOptions.tableName.getOrElse{
       logger.error("Table name not defined")
       throw new NoSuchElementException("tableName not found in options")}
