@@ -1,21 +1,24 @@
 # Sparta examples for developers
-This project is aimed at facilitating  any developer the implementation of their own Sparta plugins through showing diverse examples. Featuring all the functionalities included in our SDK, our main goal is that implementing any custom plugin becomes as easy as developing a workflow.
+This project is aimed at facilitating  any developer the implementation of their own Sparta plugins through showing examples of each kind of step. The repository features all the functionalities included in our SDK. Our main goal is, that implementing any custom plugin becomes as easy as developing a workflow.
 
 ## Getting Started
 Before get going you must first `clone` this repository. Bear in mind that all the examples available in this repository were developed using Intellij IDE with `Spark 2.2.0` and `Scala 2.11`.
 
 ### Installing
 
-Once you have it cloned  you must create a new Intellij project and  import the repository modules in our new Intellij project
-`File > Project structure > Project settings > Modules`
-This will allows us to resolve all the dependencies included in the POM examples. You can use any of the plugin examples as a sheet to start developing you own plugin. 
-Finally you must import one or both JAR's. Choosing between any of them will depend on whether you have access or not to the Stratio Crossdata library. The `sdk-lite-xd` JAR has a Crossdata dependency in it whereas the `sdk-lite` is implemented solely with Scala & Spark.  
+Once you have it cloned  you must create a new Intellij project and  import the repository modules in it:
+`File > Project structure > Project settings > Modules`. This will allow you to resolve all the dependencies included in the POMs. If you have gotten this step right you will automatically see how all the dependencies start to be resolved in the code.
+
+Finally, you must make sure to import one or both SDK JAR's in every module. You can do this by clicking in the dependency tab and then in the `+` symbol, this will allow you to browse your local filesystem and upload them. Choosing between any of them will depend on whether you have access or not to the Stratio Crossdata library.
+The `sdk-lite-xd` JAR has a Crossdata dependency in it whereas the `sdk-lite` is implemented solely with Scala & Spark. Bear in mind that if you decide to use the `sdk-lite-xd` you will also need to upload the `sdk-lite` JAR since it has the latter as a dependency in its POM.
+
+You can use  any of the plugin examples in this repository as a sheet to start developing you own plugin.
 
 ### Developing your custom plugin
 
 #### Create ad-hoc validations
 
-If there are some preconditions that must be met in order to correctly use the plugin, it is possible to add a validate method that follows this signature and return the ValidationResult ATD.
+If there are some preconditions that must be met in order to correctly use the plugin, it is possible to add a validate method that follows the following syntax and return the ValidationResult ATD.
 Please note that there is a sequence of messages, so it is possible to specify multiple errors.
 ```scala
 override def validate(): ValidationResult = {
@@ -29,6 +32,8 @@ override def validate(): ValidationResult = {
     validation
   }
 ```
+Once we load the JAR and use the appropiate custom step, these validations will be prompted in the Sparta UI as a requirement and wont let us run the workflow until we fullfil them.
+
 #### Exploit the properties
 Every plugin comes with a properties `(Map[String, String])` parameter where you can retrieve the data from:
 
@@ -80,14 +85,17 @@ In the `transformation-lite-xd` module you will find an example on how to develo
   }
 ```
 ## Generating your JAR and uploading it
-Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of our project. You can later upload this JAR using the Sparta UI. All the JARs in this repository are stored in HDFS.
+Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of your project. You can later upload this JAR using the Sparta UI. All the JARs in this repository will be stored in your /tmp folder (by default when using Sparta in a cluster these JARs will be stored in HDFS).
 ![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958966-56134300-87a4-11e9-8f8b-16ac927375b4.png?raw=true)
 
-Later, you must make sure that in the workflow setting the option for 'Add uploaded plugins' is marked. This option will allow the workflow to access all the JARs uploaded in the Plugin repository.
+Later, you must make sure that in the workflow settings the option for 'Add uploaded plugins' is marked. This option will allow the workflow to access all the JARs uploaded in the Plugin repository.
 ![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958963-557aac80-87a4-11e9-8e03-294620b80c5b.png?raw=true)
 
-Lastly, you will only need to add the matching custom box to your workflow and specify the name of your plugin class. Which of course must be contained in the JAR uploaded.
+Lastly, you will only need to add the matching custom box to your workflow and specify the name of your plugin class. Which of course must be contained in the uploaded JAR.
 ![addCustom](https://user-images.githubusercontent.com/7203924/58958964-56134300-87a4-11e9-910c-e33c57d266f7.png?raw=true)
+
+Make sure to add the full name with its packaging.
+
 ![addCustom](https://user-images.githubusercontent.com/7203924/58958961-557aac80-87a4-11e9-8147-4d763e0bdec2.png?raw=true)
 
 ## UDFs and UDAFs integration
@@ -119,6 +127,11 @@ Lastly, in order to use the newly registered UDF you just need to call it in a T
 - Input: DummyGenerator
 - Transformation: Repartition, Tokenizer
 - Output: Logger
+
+###  UDFs 
+- ToUpperCaseUDF
+- ConcatUDF
+- ToUpperCaseWithReflectionUDF
 
 ### SDK libraries
 
