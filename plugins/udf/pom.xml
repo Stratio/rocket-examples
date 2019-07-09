@@ -42,9 +42,16 @@
             <version>${apache.spark.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.stratio.spark</groupId>
+            <artifactId>spark-mllib-${apache.spark.version}_${scala.binary.version}</artifactId>
+            <version>2.4.0-70f0925</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
