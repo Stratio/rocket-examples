@@ -59,7 +59,7 @@
                 <artifactId>scala-maven-plugin</artifactId>
                 <configuration>
                     <checkMultipleScalaVersions>false</checkMultipleScalaVersions>
-                    <recompileMode>modified-only</recompileMode>
+                    <recompileMode>incremental</recompileMode>
                 </configuration>
                 <executions>
                     <execution>
