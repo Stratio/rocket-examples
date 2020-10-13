@@ -15,7 +15,7 @@
         <scala.binary.version>2.11</scala.binary.version>
         <apache.spark.version>2.2.0</apache.spark.version>
         <sparta.version>2.8.0-5880022</sparta.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <scalatest.version>2.2.5</scalatest.version>
     </properties>
 
