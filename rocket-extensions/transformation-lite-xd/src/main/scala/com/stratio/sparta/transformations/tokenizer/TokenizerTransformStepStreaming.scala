@@ -63,9 +63,6 @@ class TokenizerTransformStepStreaming(
     val splitByCharGet = splitByChar.get.charAt(0)
     val newSchema = Option(StructType(newFields))
 
-    // · Reporting
-    reportInfoLog("transform", s"Splitting column ${inputField.get} by char=$splitByCharGet to generate new schema: ${newSchema.get}")
-
     val result = inputStream.map{ row =>
       val splitValues = row.get(fieldToOperate).toString.split(splitByCharGet)
 

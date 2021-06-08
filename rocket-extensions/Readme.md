@@ -1,6 +1,17 @@
+# Rocket extensions
 
+## UDF
+
+// TODO
 
 ## Plugins
+
+- Legacy versions (Documentation in branches older than 9.5 links it)  
+    - /input-lite-xd  
+    - /output-lite-xd  
+    - /transformation-lite-xd
+
+**Note: plugins generated with new SDK versions must be included in new folders:**
 
 - rocket-1.0.0-SDK  
     - Custom Input: GeneratorXDLiteInputStepBatch & GeneratorXDLiteInputStepStreaming
@@ -17,5 +28,5 @@
     - New steps: ReportLogTestXDLiteInputStepBatch & ReportLogTestXDLiteInputStepStreaming 
     - Added reporting in:  
         - GeneratorXDLiteInputStepBatch & GeneratorXDLiteInputStepStreaming
-        - TokenizerTransformStepBatch
+        - TokenizerTransformStepBatch & TokenizerTransformStepStreaming
         - LoggerXDLiteOutputStep

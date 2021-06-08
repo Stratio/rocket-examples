@@ -1,22 +1,26 @@
+/*
+ * © 2017 Stratio Big Data Inc., Sucursal en España. All rights reserved.
+ *
+ * This software – including all its source code – contains proprietary information of Stratio Big Data Inc., Sucursal en España and may not be revealed, sold, transferred, modified, distributed or otherwise made available, licensed or sublicensed to third parties; nor reverse engineered, disassembled or decompiled, without express written authorization from Stratio Big Data Inc., Sucursal en España.
+ */
 package com.stratio.sparta.transformations.tokenizer
 
-import com.stratio.sparta.sdk.lite.streaming.LiteCustomStreamingTransform
-import com.stratio.sparta.sdk.lite.streaming.models.{OutputStreamingTransformData, ResultStreamingData}
+import java.io.{Serializable => JSerializable}
+
+import com.stratio.sparta.properties.ValidatingPropertyMap._
+import com.stratio.sparta.sdk.lite.batch.models._
 import com.stratio.sparta.sdk.lite.validation.ValidationResult
+import com.stratio.sparta.sdk.lite.xd.batch._
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.crossdata.XDSession
-import com.stratio.sparta.properties.ValidatingPropertyMap._
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
-import org.apache.spark.streaming.StreamingContext
-
+import org.apache.spark.sql.types._
 
 import scala.util.Try
 
-class TokenizerTransformStepStreaming(
-                                       xdSession: XDSession,
-                                       streamingContext: StreamingContext,
-                                       properties: Map[String, String]
-                                     ) extends LiteCustomStreamingTransform(xdSession, streamingContext, properties) {
+class TokenizerTransformStepBatch(
+                        xdSession: XDSession,
+                        properties: Map[String, String]
+                                        ) extends LiteCustomXDBatchTransform(xdSession, properties) {
 
   lazy val splitByChar: Option[String] = Try(Option(properties.getString("charPattern"))).getOrElse(None).notBlank
   lazy val inputField : Option[String] = Try(Option(properties.getString("inputField"))).getOrElse(None).notBlank
@@ -53,7 +57,7 @@ class TokenizerTransformStepStreaming(
     validation
   }
 
-  override def transform(inputData: Map[String, ResultStreamingData]): OutputStreamingTransformData = {
+  override def transform(inputData: Map[String, ResultBatchData]): OutputBatchTransformData = {
     val inputStream = inputData.head._2.data
     val newFields = Seq(
       StructField(outputField1.get, StringType),
@@ -63,15 +67,12 @@ class TokenizerTransformStepStreaming(
     val splitByCharGet = splitByChar.get.charAt(0)
     val newSchema = Option(StructType(newFields))
 
-    // · Reporting
-    reportInfoLog("transform", s"Splitting column ${inputField.get} by char=$splitByCharGet to generate new schema: ${newSchema.get}")
-
     val result = inputStream.map{ row =>
       val splitValues = row.get(fieldToOperate).toString.split(splitByCharGet)
 
       Row.fromSeq(splitValues)
     }
 
-    OutputStreamingTransformData(result, newSchema)
+    OutputBatchTransformData(result, newSchema)
   }
 }
