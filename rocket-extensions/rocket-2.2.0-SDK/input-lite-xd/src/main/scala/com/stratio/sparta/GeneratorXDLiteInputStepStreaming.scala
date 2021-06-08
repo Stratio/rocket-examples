@@ -54,6 +54,9 @@ class GeneratorXDLiteInputStepStreaming(
     dataQueue += xdSession.sparkContext.parallelize(register)
     val stream = streamingContext.queueStream(dataQueue)
 
+    // · Reporting messages
+    reportInfoLog(phase="init", s"Generated data: $register")
+
     ResultStreamingData(stream, Option(stringSchema))
   }
 }
