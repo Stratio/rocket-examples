@@ -41,7 +41,7 @@ class GeneratorXDLiteInputStepBatch(
   }
 
   override def init(): ResultBatchData = {
-    val register = Seq(new GenericRowWithSchema(Array("test-data"), stringSchema).asInstanceOf[Row])
+    val register = Seq(new GenericRowWithSchema(Array(rawData.getOrElse("test-data")), stringSchema).asInstanceOf[Row])
     val defaultRDD = xdSession.sparkContext.parallelize(register)
 
     ResultBatchData(defaultRDD, Option(stringSchema))
