@@ -1,14 +1,13 @@
 package com.stratio.sparta.transformations.tokenizer
 
-import com.stratio.sparta.sdk.lite.streaming.LiteCustomStreamingTransform
+import com.stratio.sparta.properties.ValidatingPropertyMap._
 import com.stratio.sparta.sdk.lite.streaming.models.{OutputStreamingTransformData, ResultStreamingData}
 import com.stratio.sparta.sdk.lite.validation.ValidationResult
+import com.stratio.sparta.sdk.lite.xd.streaming.LiteCustomXDStreamingTransform
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.crossdata.XDSession
-import com.stratio.sparta.properties.ValidatingPropertyMap._
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.streaming.StreamingContext
-
 
 import scala.util.Try
 
@@ -16,7 +15,7 @@ class TokenizerTransformStepStreaming(
                                        xdSession: XDSession,
                                        streamingContext: StreamingContext,
                                        properties: Map[String, String]
-                                     ) extends LiteCustomStreamingTransform(xdSession, streamingContext, properties) {
+                                     ) extends LiteCustomXDStreamingTransform(xdSession, streamingContext, properties) {
 
   lazy val splitByChar: Option[String] = Try(Option(properties.getString("charPattern"))).getOrElse(None).notBlank
   lazy val inputField : Option[String] = Try(Option(properties.getString("inputField"))).getOrElse(None).notBlank

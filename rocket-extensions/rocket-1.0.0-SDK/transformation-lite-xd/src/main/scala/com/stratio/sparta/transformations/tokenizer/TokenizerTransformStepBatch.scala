@@ -18,12 +18,12 @@ import org.apache.spark.sql.types._
 import scala.util.Try
 
 class TokenizerTransformStepBatch(
-                        xdSession: XDSession,
-                        properties: Map[String, String]
-                                        ) extends LiteCustomXDBatchTransform(xdSession, properties) {
+                                   xdSession: XDSession,
+                                   properties: Map[String, String]
+                                 ) extends LiteCustomXDBatchTransform(xdSession, properties) {
 
   lazy val splitByChar: Option[String] = Try(Option(properties.getString("charPattern"))).getOrElse(None).notBlank
-  lazy val inputField : Option[String] = Try(Option(properties.getString("inputField"))).getOrElse(None).notBlank
+  lazy val inputField: Option[String] = Try(Option(properties.getString("inputField"))).getOrElse(None).notBlank
   lazy val outputField1: Option[String] = Try(Option(properties.getString("outputField1"))).getOrElse(None).notBlank
   lazy val outputField2: Option[String] = Try(Option(properties.getString("outputField2"))).getOrElse(None).notBlank
 
@@ -67,7 +67,7 @@ class TokenizerTransformStepBatch(
     val splitByCharGet = splitByChar.get.charAt(0)
     val newSchema = Option(StructType(newFields))
 
-    val result = inputStream.map{ row =>
+    val result = inputStream.map { row =>
       val splitValues = row.get(fieldToOperate).toString.split(splitByCharGet)
 
       Row.fromSeq(splitValues)
