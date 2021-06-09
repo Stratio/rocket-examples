@@ -58,12 +58,11 @@ class TokenizerTransformStepStreaming(
       StructField(outputField1.get, StringType),
       StructField(outputField2.get, StringType)
     )
-    val fieldToOperate = inputData.head._2.schema.get.fieldIndex(inputField.get)
     val splitByCharGet = splitByChar.get.charAt(0)
     val newSchema = Option(StructType(newFields))
 
     val result = inputStream.map{ row =>
-      val splitValues = row.get(fieldToOperate).toString.split(splitByCharGet)
+      val splitValues = row.getAs[String](inputField.get).split(splitByCharGet)
 
       Row.fromSeq(splitValues)
     }

@@ -18,7 +18,7 @@ class TokenizerTransformStepStreaming(
                                      ) extends LiteCustomXDStreamingTransform(xdSession, streamingContext, properties) {
 
   lazy val splitByChar: Option[String] = Try(Option(properties.getString("charPattern"))).getOrElse(None).notBlank
-  lazy val inputField : Option[String] = Try(Option(properties.getString("inputField"))).getOrElse(None).notBlank
+  lazy val inputField: Option[String] = Try(Option(properties.getString("inputField"))).getOrElse(None).notBlank
   lazy val outputField1: Option[String] = Try(Option(properties.getString("outputField1"))).getOrElse(None).notBlank
   lazy val outputField2: Option[String] = Try(Option(properties.getString("outputField2"))).getOrElse(None).notBlank
 
@@ -53,20 +53,29 @@ class TokenizerTransformStepStreaming(
   }
 
   override def transform(inputData: Map[String, ResultStreamingData]): OutputStreamingTransformData = {
+
+    // · Reporting
+    reportInfoLog("transform",
+      s"Input data: ${inputData.head._1} - Splitting column=${inputField.get} by char=${splitByChar.get.charAt(0)} to generate new schema: " +
+        s"${
+          StructType(Seq(
+            StructField(outputField1.get, StringType),
+            StructField(outputField2.get, StringType)
+          ))
+        }"
+    )
+
     val inputStream = inputData.head._2.data
     val newFields = Seq(
       StructField(outputField1.get, StringType),
       StructField(outputField2.get, StringType)
     )
-    val fieldToOperate = inputData.head._2.schema.get.fieldIndex(inputField.get)
     val splitByCharGet = splitByChar.get.charAt(0)
     val newSchema = Option(StructType(newFields))
+    val columnToOperate = inputField.get
 
-    // · Reporting
-    reportInfoLog("transform", s"Splitting column ${inputField.get} by char=$splitByCharGet to generate new schema: ${newSchema.get}")
-
-    val result = inputStream.map{ row =>
-      val splitValues = row.get(fieldToOperate).toString.split(splitByCharGet)
+    val result = inputStream.map { row =>
+      val splitValues = row.getAs[String](columnToOperate).split(splitByCharGet)
 
       Row.fromSeq(splitValues)
     }
