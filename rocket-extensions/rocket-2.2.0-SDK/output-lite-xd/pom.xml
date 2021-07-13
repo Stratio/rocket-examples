@@ -15,7 +15,7 @@
         <scala.binary.version>2.12</scala.binary.version>
         <apache.spark.version>3.0.1</apache.spark.version>
         <crossdata.version>3.0.1-e8c78f2</crossdata.version>
-        <rocket.version>2.2.0-PR1100-SNAPSHOT</rocket.version>
+        <rocket.version>2.2.0-SNAPSHOT</rocket.version>
     </properties>
 
     <dependencies>
