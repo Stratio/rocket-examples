@@ -138,3 +138,13 @@ python3 schema_convert.py --input input.json --language scala
     ]
 }
 ```
+
+Output in Python:
+```python
+StructType([StructField("field1", StringType(), True),StructField("field2", BooleanType(), True),StructField("field3", ArrayType(StringType()), True),StructField("field4", ArrayType(StructType([StructField("x", StringType(), True),StructField("y", StringType(), True),StructField("z", StringType(), True)])), True),StructField("field5", StructType([StructField("a", StringType(), True),StructField("b", StringType(), True),StructField("c", StringType(), True)]), True)])
+```
+
+Output in Scala:
+```scala
+StructType(Seq(StructField("field1", StringType, true),StructField("field2", BooleanType, true),StructField("field3", ArrayType(StringType), true),StructField("field4", ArrayType(StructType(Seq(StructField("x", StringType, true),StructField("y", StringType, true),StructField("z", StringType, true)))), true),StructField("field5", StructType(Seq(StructField("a", StringType, true),StructField("b", StringType, true),StructField("c", StringType, true))), true)))
+```
