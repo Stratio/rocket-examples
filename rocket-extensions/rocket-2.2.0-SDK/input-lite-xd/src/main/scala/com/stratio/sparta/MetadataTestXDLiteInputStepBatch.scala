@@ -31,7 +31,7 @@ class MetadataTestXDLiteInputStepBatch(
 
   /** Main plugin functions */
 
-  override def validate(): ValidationResult = ValidationResult(valid = true, messages = Seq.empty)
+  override def validate(): ValidationResult = ValidationResult(valid = true, messages = Seq.empty, warnings = Seq.empty)
 
   override def init(): ResultBatchData = {
 

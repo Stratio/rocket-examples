@@ -24,7 +24,7 @@ class ReportLogTestXDLiteInputStepBatch(
 
 
   override def validate(): ValidationResult = {
-    var validation = ValidationResult(valid = true, messages = Seq.empty)
+    var validation = ValidationResult(valid = true, messages = Seq.empty, warnings = Seq.empty)
 
     if (rawData.isEmpty) {
       validation = ValidationResult(

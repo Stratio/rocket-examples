@@ -32,7 +32,7 @@ class GeneratorXDLiteInputStepStreaming(
   lazy val rawData: Option[String] = properties.get("raw").map(_.toString)
 
   override def validate(): ValidationResult = {
-    var validation = ValidationResult(valid = true, messages = Seq.empty)
+    var validation = ValidationResult(valid = true, messages = Seq.empty, warnings = Seq.empty)
 
     if (rawData.isEmpty) {
       validation = ValidationResult(
