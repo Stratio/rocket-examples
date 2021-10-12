@@ -8,8 +8,8 @@ package org.apache.spark.sql.sparta.udf
 
 import com.stratio.sparta.sdk.lite.common.SpartaUDF
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.{DoubleType, IntegerType}
 import org.apache.spark.ml.linalg.VectorUDT
+import org.apache.spark.sql.functions.udf
 
 case object VectorUDT extends VectorUDT
 
@@ -19,8 +19,7 @@ case class GetDenseVectorUDF() extends SpartaUDF {
 
   val getVectorElement = (vector: org.apache.spark.ml.linalg.Vector, num: Int) => vector(num)
 
-  val userDefinedFunction: UserDefinedFunction =
-    UserDefinedFunction(getVectorElement , DoubleType, Option(Seq(VectorUDT, IntegerType)))
+  val userDefinedFunction: UserDefinedFunction = udf(getVectorElement)
 }
 
 

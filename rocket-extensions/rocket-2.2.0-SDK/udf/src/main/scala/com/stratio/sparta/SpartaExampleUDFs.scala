@@ -7,11 +7,8 @@
 package com.stratio.sparta
 
 import com.stratio.sparta.sdk.lite.common.SpartaUDF
-import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.types.StringType
-
-import scala.util.Try
+import org.apache.spark.sql.functions.udf
 
 case class ToUpperCaseUDF() extends SpartaUDF {
 
@@ -19,30 +16,17 @@ case class ToUpperCaseUDF() extends SpartaUDF {
 
   val upper: String => String = _.toUpperCase
 
-  val userDefinedFunction: UserDefinedFunction =
-    UserDefinedFunction(upper , StringType, Option(Seq(StringType)))
+  val userDefinedFunction: UserDefinedFunction = udf(upper)
+
 }
 
 case class ConcatUDF() extends SpartaUDF {
 
   val name = "concatSparta"
 
-  val upper: (String, String) => String =  { case (str1, str2) =>
+  val concat: (String, String) => String =  { case (str1, str2) =>
     s"$str1/$str2"
   }
 
-  val userDefinedFunction: UserDefinedFunction =
-    UserDefinedFunction(upper , StringType, Option(Seq(StringType, StringType)))
-}
-
-case class ToUpperCaseWithReflectionUDF() extends SpartaUDF {
-
-  val name = "upperCaseReflect"
-
-  val upper: String => String = _.toUpperCase
-
-  val userDefinedFunction: UserDefinedFunction = {
-    val inputTypes = Try(ScalaReflection.schemaFor(ScalaReflection.localTypeOf[String]).dataType :: Nil).toOption
-    UserDefinedFunction(upper , ScalaReflection.schemaFor(ScalaReflection.localTypeOf[String]).dataType, inputTypes)
-  }
+  val userDefinedFunction: UserDefinedFunction = udf(concat)
 }
