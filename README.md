@@ -1,4 +1,4 @@
-# Sparta examples for developers
+# Rocket examples for developers
 This project is aimed at facilitating  any developer the implementation of their own Sparta plugins through showing examples of each kind of step. The repository features all the functionalities included in our SDK. Our main goal is, that implementing any custom plugin becomes as easy as developing a workflow.
 
 ## Getting Started
