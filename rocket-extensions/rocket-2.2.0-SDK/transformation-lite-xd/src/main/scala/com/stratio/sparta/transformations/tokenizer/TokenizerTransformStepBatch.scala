@@ -28,7 +28,7 @@ class TokenizerTransformStepBatch(
   lazy val outputField2: Option[String] = Try(Option(properties.getString("outputField2"))).getOrElse(None).notBlank
 
   override def validate(): ValidationResult = {
-    var validation = ValidationResult(valid = true, messages = Seq.empty)
+    var validation = ValidationResult(valid = true, messages = Seq.empty, warnings = Seq.empty)
 
     if (splitByChar.isEmpty) {
       validation = ValidationResult(
