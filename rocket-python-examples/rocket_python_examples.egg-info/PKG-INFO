@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: rocket-python-examples
+Version: 0.1.0
+Summary: Rocket python examples
+Home-page: UNKNOWN
+Author: Stratio Rocket
+Author-email: UNKNOWN
+License: UNKNOWN
+Description: Stratio Rocket - python examples
+Keywords: Rocket,Python
+Platform: Linux
+Classifier: Programming Language :: Python :: 3.7

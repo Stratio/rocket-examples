@@ -1,0 +1,7 @@
+setup.py
+rocket_python_examples/__init__.py
+rocket_python_examples/test.py
+rocket_python_examples.egg-info/PKG-INFO
+rocket_python_examples.egg-info/SOURCES.txt
+rocket_python_examples.egg-info/dependency_links.txt
+rocket_python_examples.egg-info/top_level.txt
