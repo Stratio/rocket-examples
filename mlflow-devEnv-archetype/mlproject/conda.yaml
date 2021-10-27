@@ -1,0 +1,19 @@
+# -----------------------------------------------------------------
+#  Definition file for a python Conda managed virtual environment
+# -----------------------------------------------------------------
+
+# V.env name
+name: XXXXXXXXXX
+
+# Conda channels (repositories) used to retrieve python packages
+channels:
+  - defaults
+
+# Dependencies
+dependencies:
+  # From conda repositories (channels)
+  - python=3.7.6
+  - pip=20.2.2 # <-- pip: python package manager
+  - pip:
+      # Python packages managed with Pip instead of Conda
+      - mlflow==1.15.0
