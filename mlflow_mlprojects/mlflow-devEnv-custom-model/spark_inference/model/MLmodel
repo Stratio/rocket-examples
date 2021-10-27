@@ -1,0 +1,13 @@
+artifact_path: model
+flavors:
+  python_function:
+    cloudpickle_version: 2.0.0
+    env: conda.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.7.6
+run_id: c874e2ead8864acaa377d6252e03277b
+signature:
+  inputs: '[{"name": "class", "type": "string"}]'
+  outputs: '[{"name": "prediction", "type": "string"}]'
+utc_time_created: '2021-10-27 08:13:47.929231'

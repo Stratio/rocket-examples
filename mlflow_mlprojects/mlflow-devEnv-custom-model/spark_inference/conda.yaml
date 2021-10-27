@@ -1,0 +1,36 @@
+# -----------------------------------------------------------------------------------------------------------------
+# Python V. env to be used in pySpark in order to make predictions with a python_flavour MlFlow model
+#
+# Example:
+#   name: mlflow-env
+#   channels:
+#   - defaults
+#   - conda-forge
+#   dependencies:
+#   - python=3.7.6
+#   - pip=20.2.2
+#   - pip:
+#     - mlflow==1.15.0
+#     - scikit-learn==0.22.1
+#     - cloudpickle==2.0.0
+#     - pyarrow==5.0.0
+#
+# Note:
+#   · Pre-requisite: binary distribution of Spark (SPARK_HOME env. var pointing to spark directory)
+#   · pyspark and py4j dependencies are provided at runtime (getting them from Spark binary distribution)
+#   · pyarrow is necessary in order to use Pandas UDF in Spark --> Mlflow do not include in it MLModel conda.yaml
+# -----------------------------------------------------------------------------------------------------------------
+
+name: mlflow-env
+
+channels:
+- defaults
+- conda-forge
+
+dependencies:
+- python=3.7.6
+- pip=20.2.2
+- pip:
+  - mlflow==1.15.0
+  - cloudpickle==2.0.0
+  - pyarrow==5.0.0

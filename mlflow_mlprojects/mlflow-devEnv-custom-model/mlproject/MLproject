@@ -1,0 +1,15 @@
+name: test
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      training_data: string
+      feature_column_name: {type: string, default: class}
+      prediction_column_name: {type: string, default: prediction}
+
+      output_column_name: {type: string, default: prediction}
+      output_column_type: {type: string, default: string }
+
+    command: python train.py --training_data={training_data} --feature_column_name={feature_column_name} --prediction_column_name={prediction_column_name}

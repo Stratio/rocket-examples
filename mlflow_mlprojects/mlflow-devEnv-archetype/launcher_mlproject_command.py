@@ -24,7 +24,8 @@ client = MlflowClient(
     tracking_uri="file://{}".format(os.path.join(wd, 'mlflow_runs'))
 )
 experiment_id = "local"
-client.create_experiment(experiment_id)
+if not client.get_experiment_by_name(experiment_name):
+    client.create_experiment(experiment_name)
 
 # Executing command defined in MLproject file ~ Mlflow launcher
 train.main(
