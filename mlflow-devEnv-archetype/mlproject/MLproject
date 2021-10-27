@@ -1,0 +1,10 @@
+name: XXXXXXXX
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      training_data: string
+
+    command: python train.py --training-data={training_data}
