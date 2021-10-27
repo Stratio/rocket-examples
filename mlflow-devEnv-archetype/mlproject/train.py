@@ -17,6 +17,10 @@ def main(argv):
     args = parse_args(argv)  # mandatory
     pd_data = pd.read_csv(args.training_data)  # mandatory
 
+    """ Tracking """
+    with mlflow.start_run() as run:
+        print('MFlown run {}'.format(run.info))
+
 
 if __name__ == '__main__':
     main(sys.argv[1:])

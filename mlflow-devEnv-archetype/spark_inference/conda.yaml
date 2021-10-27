@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------
 # Python V. env to be used in pySpark in order to make predictions with a python_flavour MlFlow model
 #
 # Example:
@@ -18,4 +18,5 @@
 # Note:
 #   · Pre-requisite: binary distribution of Spark (SPARK_HOME env. var pointing to spark directory)
 #   · pyspark and py4j dependencies are provided at runtime (getting them from Spark binary distribution)
-# ------------------------------------------------------------------------------------------------------
+#   · pyarrow is necessary in order to use Pandas UDF in Spark --> Mlflow do not include in it MLModel conda.yaml
+# -----------------------------------------------------------------------------------------------------------------

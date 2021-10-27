@@ -19,7 +19,6 @@ import mlflow
 spark = SparkSession.builder.master("local[*]")\
     .appName("Debugging Spark-Mlflow integration") \
     .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
-    .config("spark.sql.execution.pandas.convertToArrowArraySafely", "true") \
     .getOrCreate()
 
 # => Reading data ~ Rocket integration
@@ -31,21 +30,42 @@ df = spark.read.csv(
 
 # => Mlflow logged model path ~ Rocket integration
 modelDirPath = os.path.join(wd, 'spark_inference', 'model')
+# · Loading model
+loaded_model = mlflow.pyfunc.load_model(modelDirPath)
 
-# => Input features:
-# - extracted from model metadata ~ signature ~ Rocket integration (if your model do not contains a signature,
-#   features must be manually defined
-inputSignature = [
-    {"name": "xxxxx", "type": "yyyy"},
-    ...
-]
-features = [s["name"] for s in inputSignature]
-
-# => Defining Mlflow spark udf output column ~ Rocket integration
-predictionColumnName = "prediction"
-predictionColumnType = "long"
 
 # => Constructing UDF ~ Rocket integration
+#     · We need input features, output column name and output column type
+features = None
+output_spark_schema = None
+
+# Try to use model signature to infer this parameters
+if loaded_model.metadata.signature:
+    # Input features
+    input_signature = loaded_model.metadata.signature.inputs
+    features = [s.name for s in input_signature.inputs]
+    # Output column name & type
+    output_signature = loaded_model.metadata.signature.outputs
+    output_spark_schema = output_signature.as_spark_schema()
+
+
+# · Input features
+if not features:
+    features = ["XXXXXXXXXX"]  # Must be defined manually if your logged model do not incorporate signature
+print("Input features for UDF: {}".format(features))
+
+# · Output column name & type
+if not output_spark_schema:
+    predictionColumnName = "XXXXXX"  # Must be defined manually if your logged model do not incorporate signature
+    predictionColumnType = "XXXXXX"  # Must be defined manually if your logged model do not incorporate signature
+else:
+    print("Spark schema: {}".format(output_spark_schema))
+    predictionColumnName = output_spark_schema[0].name
+    predictionColumnType = output_spark_schema[0].dataType
+
+print("Prediction column name for UDF: {}".format(predictionColumnName))
+print("Prediction column type for UDF: {}".format(predictionColumnType))
+
 prediction_udf = mlflow.pyfunc.spark_udf(spark, modelDirPath, result_type=predictionColumnType)
 
 # => Making predictions ~ Rocket integration
