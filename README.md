@@ -84,21 +84,10 @@ In the `transformation-lite-xd` module you will find an example on how to develo
   }
 ```
 ## Generating your JAR and uploading it
-Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of your project. You can later upload this JAR using the Sparta UI. All the JARs in this repository will be stored in your /tmp folder (by default when using Sparta in a cluster these JARs will be stored in HDFS).
-![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958966-56134300-87a4-11e9-8f8b-16ac927375b4.png?raw=true)
-
-Later, you must make sure that in the workflow settings the option for 'Add uploaded plugins' is marked. This option will allow the workflow to access all the JARs uploaded in the Plugin repository.
-![uploadPlugin](https://user-images.githubusercontent.com/7203924/58958963-557aac80-87a4-11e9-8e03-294620b80c5b.png?raw=true)
-
-Lastly, you will only need to add the matching custom box to your workflow and specify the name of your plugin class. Which of course must be contained in the uploaded JAR.
-![addCustom](https://user-images.githubusercontent.com/7203924/58958964-56134300-87a4-11e9-910c-e33c57d266f7.png?raw=true)
-
-Make sure to add the full name with its packaging.
-
-![addCustom](https://user-images.githubusercontent.com/7203924/58958961-557aac80-87a4-11e9-8147-4d763e0bdec2.png?raw=true)
+Once your code is done and tested you can go ahead and generate your custom JAR by using `mvn clean package`. A JAR will be generated and located in the target folder of your project. You can later upload this JAR using the Sparta UI. All the JARs in this repository will be stored in your project folder (by default when using Rocket in a cluster these JARs will be stored in HDFS).
 
 ## UDFs and UDAFs integration
-Stratio Sparta broadens the utilities available for you in this release in order to add versatility to workflow development. Now UDF’s and UDAF’s are fully integrated into the SDK.
+Stratio Rocket broadens the utilities available for you in this release in order to add versatility to workflow development. Now UDF’s and UDAF’s are fully integrated into the SDK.
 
 You will only need to extend the traits found in the sdk-lite package in order to start developing your own.
 
