@@ -40,8 +40,7 @@ Every plugin comes with a properties `(Map[String, String])` parameter where you
     - Any user-defined property inside the Option properties field.
     - All the variables passed inside the tab Writer (without whitespaces and written in camel case)
     
-These (key,values) can be defined from the plugin step while building the workflow. 
-![properties](https://hydra.stratio.com/wp-content/uploads/sites/14/stratio-sparta398000715.png?raw=true)
+These (key,values) can be defined from the plugin step while building the workflow.
     
 An example on how to access this data from any input, transformation or output could be as follows:
 ```scala
