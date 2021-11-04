@@ -1,8 +1,8 @@
 # Rocket examples for developers
-This project is aimed at facilitating  any developer the implementation of their own Sparta plugins through showing examples of each kind of step. The repository features all the functionalities included in our SDK. Our main goal is, that implementing any custom plugin becomes as easy as developing a workflow.
+This project is aimed at facilitating  any developer the implementation of their own Sparta plugins or Rocket extensions through showing examples of each kind of step. The repository features all the functionalities included in our SDK. Our main goal is, that implementing any custom plugin becomes as easy as developing a workflow.
 
 ## Getting Started
-Before get going you must first `clone` this repository. Bear in mind that all the examples available in this repository were developed using Intellij IDE with `Spark 2.2.0` and `Scala 2.11`.
+Before get going you must first `clone` this repository. Bear in mind that all the examples available in this repository were developed using Intellij IDE with `Scala 2.12`.
 
 ### Installing
 
@@ -120,23 +120,6 @@ After getting this done, it will be necessary to first upload the JAR with the s
 
 Lastly, in order to use the newly registered UDF you just need to call it in a Trigger transformation and pass it some valid value.
 ![UDFUsage](https://user-images.githubusercontent.com/7203924/58961479-827d8e00-87a9-11e9-90f3-c0974068dc9b.png?raw=true)
-
-## Examples and tools
-### Plugins
-
-- Input: DummyGenerator
-- Transformation: Repartition, Tokenizer
-- Output: Logger
-
-###  UDFs 
-- ToUpperCaseUDF
-- ConcatUDF
-- ToUpperCaseWithReflectionUDF
-
-### SDK libraries
-
-- sdk-lite-2.8.0-5880022
-- sdk-lite-xd-2.8.0-5880022
 
 
 ## Built With
