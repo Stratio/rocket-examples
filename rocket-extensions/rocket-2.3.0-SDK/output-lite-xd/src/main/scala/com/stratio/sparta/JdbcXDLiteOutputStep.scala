@@ -19,21 +19,33 @@ class JdbcXDLiteOutputStep(
                             )
   extends LiteCustomXDOutput(xdSession, properties) {
 
-  lazy val url = properties.getOrElse("url", throw new NoSuchElementException("The url is mandatory"))
+  lazy val url = properties.getOrElse("url", throw new NoSuchElementException("The url property is mandatory"))
 
   // Lineage options, usually extracted from 'url' or other properties as 'dbtable'
-  lazy val service = properties.get("service")
-  lazy val path = properties.get("path")
-  lazy val resource = properties.get("resource")
-  lazy val dataType = properties.get("dataType")
-
+  override def lineageService(): Option[String] = properties.get("service")
+  override def lineagePath(): Option[String] = properties.get("path")
+  override def lineageResource(): Option[String] = properties.get("resource")
+  override def lineageDatastoreType(): Option[String] = properties.get("datastoreType")
 
   override def save(data: DataFrame, outputOptions: OutputOptions): Unit = {
     val tableName = outputOptions.tableName.getOrElse{
       logger.error("Table name not defined")
-      throw new NoSuchElementException("tableName not found in options")}
+      throw new NoSuchElementException("tableName not found in options")
+    }
 
-    data.write.jdbc(url = url, table = tableName, connectionProperties = new Properties())
+    val jdbcProperties = new Properties()
+
+    properties
+      .filterKeys(key => key.startsWith("jdbc_") || key.equals("driver"))
+      .foreach{ case (key, value) => jdbcProperties.put(key.replaceAll("jdbc_", ""), value) }
+
+    logger.error(s"Connecting with table $tableName")
+    logger.error(s"Connecting with properties $jdbcProperties")
+
+    //data.write
+    // .mode(SaveMode.Append)
+    // .jdbc(url = url, table = tableName, connectionProperties = jdbcProperties)
+    data.count()
   }
 
   override def save(data: DataFrame, saveMode: String, saveOptions: Map[String, String]): Unit = ()
