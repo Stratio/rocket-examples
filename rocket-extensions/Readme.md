@@ -7,9 +7,9 @@
 ## Plugins
 
 - Legacy versions (Documentation in branches older than 9.5 links it)  
-    - /input-lite-xd  
-    - /output-lite-xd  
-    - /transformation-lite-xd
+    - /old-extensions/input-lite-xd  
+    - /old-extensions/output-lite-xd  
+    - /old-extensions/transformation-lite-xd
 
 **Note: plugins generated with new SDK versions must be included in new folders:**
 
