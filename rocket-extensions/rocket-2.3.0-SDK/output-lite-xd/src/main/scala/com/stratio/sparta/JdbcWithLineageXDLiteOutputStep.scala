@@ -13,7 +13,7 @@ import org.apache.spark.sql.crossdata.XDSession
 import java.util.Properties
 import scala.util.{Failure, Success, Try}
 
-class JdbcXDLiteOutputStep(
+class JdbcWithLineageXDLiteOutputStep(
                               xdSession: XDSession,
                               properties: Map[String, String]
                             )
