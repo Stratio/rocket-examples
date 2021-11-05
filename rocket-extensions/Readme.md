@@ -30,3 +30,7 @@
         - GeneratorXDLiteInputStepBatch & GeneratorXDLiteInputStepStreaming
         - TokenizerTransformStepBatch & TokenizerTransformStepStreaming
         - LoggerXDLiteOutputStep
+
+- rocket-2.3.0-SDK  
+    - New functionality: Lineage and QRs definition in custom steps
+    - New steps: JdbcWithLineageXDLiteOutputStep
