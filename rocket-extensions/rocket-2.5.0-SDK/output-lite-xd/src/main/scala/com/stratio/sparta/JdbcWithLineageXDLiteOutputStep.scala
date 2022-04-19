@@ -42,10 +42,9 @@ class JdbcWithLineageXDLiteOutputStep(
     logger.error(s"Connecting with table $tableName")
     logger.error(s"Connecting with properties $jdbcProperties")
 
-    //data.write
-    // .mode(SaveMode.Append)
-    // .jdbc(url = url, table = tableName, connectionProperties = jdbcProperties)
-    data.count()
+    data.write
+     .mode(SaveMode.Append)
+     .jdbc(url = url, table = tableName, connectionProperties = jdbcProperties)
   }
 
   override def save(data: DataFrame, saveMode: String, saveOptions: Map[String, String]): Unit = ()
