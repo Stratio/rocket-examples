@@ -6,17 +6,19 @@
 
 package com.stratio.sparta
 
+import com.stratio.connectors.sscccommons.rocket.{CustomLineage, CustomLineageResult}
+
 object CustomLineageQrs {
 
-  def getHDFSMetadata(options: Map[String, String]): Map[String, String] =
-    Map(
-      "metadataPath" -> "s000001-hdfs1.s000001://tmp/tablaVolcado>/:tablaVolcado:",
-      "dataStoreType" -> "HDFS"
+  def getHDFSMetadata(customLineage: CustomLineage): CustomLineageResult =
+    CustomLineageResult(
+      metadataPath = "s000001-hdfs1.s000001://tmp/tablaVolcado>/:tablaVolcado:",
+      dataStoreType = "HDFS"
     )
 
-  def getHDFSMetadataFromOptions(options: Map[String, String]): Map[String, String] = {
-    val path = options.getOrElse("path", "/tmp")
-    val metadataPath = options.get("tableName") match {
+  def getHDFSMetadataFromOptions(customLineage: CustomLineage): CustomLineageResult = {
+    val path = customLineage.options.getOrElse("path", "/tmp")
+    val metadataPath = customLineage.tableName match {
       case Some(tableName) =>
         s"s000001-hdfs1.s000001:/$path/$tableName>/:$tableName:"
       case None =>
@@ -24,34 +26,34 @@ object CustomLineageQrs {
         s"s000001-hdfs1.s000001:/$path>/:$file:"
     }
 
-    Map(
-      "metadataPath" -> metadataPath,
-      "dataStoreType" -> "HDFS"
+    CustomLineageResult(
+      metadataPath = metadataPath,
+      dataStoreType = "HDFS"
     )
   }
 
-  def getJDBCMetadata(options: Map[String, String]): Map[String, String] =
-    Map(
-      "metadataPath" -> "s000001-postgresqa.s000001://rocket-nightly>/:enriched.users_with_diagnosis:",
-      "dataStoreType" -> "SQL"
+  def getJDBCMetadata(customLineage: CustomLineage): CustomLineageResult =
+    CustomLineageResult(
+      metadataPath = "s000001-postgresqa.s000001://rocket-nightly>/:enriched.users_with_diagnosis:",
+      dataStoreType = "SQL"
     )
 
-  def getJDBCMetadataFromOptions(options: Map[String, String]): Map[String, String] = {
-    (options.get("tableName"), options.get("dbtable")) match {
+  def getJDBCMetadataFromOptions(customLineage: CustomLineage): CustomLineageResult = {
+    (customLineage.tableName, customLineage.options.get("dbtable")) match {
       case (Some(tableName), _) =>
-        Map(
-          "metadataPath" -> s"s000001-postgresqa.s000001://rocket-nightly>/:$tableName:",
-          "dataStoreType" -> "SQL"
+        CustomLineageResult(
+          metadataPath = s"s000001-postgresqa.s000001://rocket-nightly>/:$tableName:",
+          dataStoreType = "SQL"
         )
 
       case (_, Some(sparkDbTable)) =>
-        Map(
-          "metadataPath" -> s"s000001-postgresqa.s000001://rocket-nightly>/:$sparkDbTable:",
-          "dataStoreType" -> "SQL"
+        CustomLineageResult(
+          metadataPath = s"s000001-postgresqa.s000001://rocket-nightly>/:$sparkDbTable:",
+          dataStoreType = "SQL"
         )
 
       case _ =>
-        Map.empty
+        throw new Exception("Invalid custom properties, missing dbtable option")
     }
 
   }
