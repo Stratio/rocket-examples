@@ -1,3 +1,3 @@
 
-def user2_func(x):
+def user_func(x):
     return f"Hello '{x}' I'm user2"
