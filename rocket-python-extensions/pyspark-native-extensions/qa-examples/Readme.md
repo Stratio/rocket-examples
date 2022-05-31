@@ -103,9 +103,9 @@ Se pueden copiar a la máquina de bootstrap y desde ahí, pues abrir un servidor
 
 Los artefactos se pueden descargar desde el servidor de ficheros desde las siguientes URLs:
 
-http://bootstrap.xray.labs.stratio.com:6969/test_pyfile_egg_pkg_from_http-0.1.0-py3.9.egg
-http://bootstrap.xray.labs.stratio.com:6969/test_pyfile_from_http.py
-http://bootstrap.xray.labs.stratio.com:6969/test_pyfile_zip_pkg_from_http.zip
+* http://bootstrap.xray.labs.stratio.com:6969/test_pyfile_egg_pkg_from_http-0.1.0-py3.9.egg
+* http://bootstrap.xray.labs.stratio.com:6969/test_pyfile_from_http.py
+* http://bootstrap.xray.labs.stratio.com:6969/test_pyfile_zip_pkg_from_http.zip
 
     
 ## Same module test
