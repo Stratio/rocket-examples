@@ -14,7 +14,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <scala.binary.version>2.12</scala.binary.version>
         <scala.version>2.12.10</scala.version>
-        <connectors.sscc-commons.version>0.3.0-PR33-SNAPSHOT</connectors.sscc-commons.version>
+        <connectors.sscc-commons.version>0.3.0-M15</connectors.sscc-commons.version>
     </properties>
 
     <dependencies>
