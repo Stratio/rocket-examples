@@ -6,7 +6,7 @@
 
 package com.stratio.sparta
 
-import com.stratio.connectors.sscccommons.rocket.{CustomLineage, CustomLineageResult}
+import com.stratio.connectors.sscccommons.rocket._
 
 object CustomLineageQrs {
 
@@ -55,6 +55,19 @@ object CustomLineageQrs {
       case _ =>
         throw new Exception("Invalid custom properties, missing dbtable option")
     }
+
+  }
+
+  /**
+   * Since we do not want to have table names collisions,
+   * we should pass the name for the new table to the method inside the object CustomPlannedQualityRule
+   * */
+
+  def getCreateTableFromOptions(customCreateTableQrs: CustomPlannedQualityRule): CustomPlannedQualityRuleResult = {
+    if (customCreateTableQrs.tableName.isEmpty)
+      throw new RuntimeException("Cannot create table because tableName is empty")
+    else
+      CustomPlannedQualityRuleResult(createTable = s"CREATE TABLE ${customCreateTableQrs.tableName} as select '${customCreateTableQrs.metadataPath}' as metadataPath, '${customCreateTableQrs.securityOptions.`type`}' as security, '${customCreateTableQrs.options}' as extraOptions")
 
   }
 }
