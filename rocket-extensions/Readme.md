@@ -35,5 +35,5 @@
     - New functionality: Lineage and QRs definition in custom steps
     - New steps: JdbcWithLineageXDLiteOutputStep
 
-- rocket-2.5.0-SDK  
+- rocket-3.0.0-SDK  
     - New functionality: Hybrid custom steps
