@@ -21,12 +21,6 @@ class JdbcWithLineageXDLiteOutputStep(
 
   lazy val url = properties.getOrElse("url", throw new NoSuchElementException("The url property is mandatory"))
 
-  // Lineage options, usually extracted from 'url' or other properties as 'dbtable'
-  // TODO - SDK en master no parece tener alguno de estos métodos para sobre-escribir
-/*  override def lineageService(): Option[String] = properties.get("service")
-  override def lineagePath(): Option[String] = properties.get("path")
-  override def lineageResource(): Option[String] = properties.get("resource") // If empty will be populated by the system the writer tableName
-  override def lineageDatastoreType(): Option[String] = properties.get("datastoreType")*/
 
   override def save(data: DataFrame, outputOptions: OutputOptions): Unit = {
     val tableName = outputOptions.tableName.getOrElse{
