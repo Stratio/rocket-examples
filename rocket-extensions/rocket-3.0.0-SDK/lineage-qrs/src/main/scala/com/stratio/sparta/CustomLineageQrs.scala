@@ -6,9 +6,10 @@
 
 package com.stratio.sparta
 
-import com.stratio.connectors.sscccommons.rocket._
+import akka.event.slf4j.SLF4JLogging
+import com.stratio.connectors.sscccommons.rocket.{CustomLineage, CustomLineageResult, CustomPlannedQualityRule, CustomPlannedQualityRuleResult}
 
-object CustomLineageQrs {
+object CustomLineageQrs extends SLF4JLogging {
 
   def getHDFSMetadata(customLineage: CustomLineage): CustomLineageResult =
     CustomLineageResult(
@@ -66,8 +67,11 @@ object CustomLineageQrs {
   def getCreateTableFromOptions(customCreateTableQrs: CustomPlannedQualityRule): CustomPlannedQualityRuleResult = {
     if (customCreateTableQrs.tableName.isEmpty)
       throw new RuntimeException("Cannot create table because tableName is empty")
-    else
-      CustomPlannedQualityRuleResult(createTable = s"CREATE TABLE ${customCreateTableQrs.tableName} as select '${customCreateTableQrs.metadataPath}' as metadataPath, '${customCreateTableQrs.securityOptions.`type`}' as security, '${customCreateTableQrs.options}' as extraOptions")
+    else {
+      log.info(s"Trying to create table ${customCreateTableQrs.tableName} with driver ${customCreateTableQrs.driver}, uri ${customCreateTableQrs.uri}, metadatapath ${customCreateTableQrs.metadataPath} securityOptions ${customCreateTableQrs.securityOptions.options} and secType ${customCreateTableQrs.securityOptions.`type`}, datastoreProps ${customCreateTableQrs.datastoreProperties} " +
+        s", resourceProperties ${customCreateTableQrs.resourceProperties}, governanceProperties ${customCreateTableQrs.governanceProperties}")
+      CustomPlannedQualityRuleResult(createTable = s"CREATE TABLE ${customCreateTableQrs.tableName} as select '${customCreateTableQrs.metadataPath}' as metadataPath, '${customCreateTableQrs.securityOptions.`type`}' as security, '${customCreateTableQrs.extraProperties}' as extraOptions")
+    }
 
   }
 }

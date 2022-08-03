@@ -14,7 +14,9 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <scala.binary.version>2.12</scala.binary.version>
         <scala.version>2.12.10</scala.version>
-        <connectors.sscc-commons.version>0.3.0-M15</connectors.sscc-commons.version>
+        <connectors.sscc.binary.version>0.3</connectors.sscc.binary.version>
+        <connectors.sscc.commons.version>1.0.0-M4</connectors.sscc.commons.version>
+        <akka.version>2.5.31</akka.version>
     </properties>
 
     <dependencies>
@@ -26,8 +28,14 @@
         </dependency>
         <dependency>
             <groupId>com.stratio.connectors.ssccsdk</groupId>
-            <artifactId>sscc-commons_${scala.binary.version}</artifactId>
+            <artifactId>sscc-commons-${connectors.sscc.binary.version}_${scala.binary.version}</artifactId>
             <version>${connectors.sscc-commons.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-slf4j_${scala.binary.version}</artifactId>
+            <version>${akka.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
