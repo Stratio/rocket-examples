@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.stratio.sparta</groupId>
     <artifactId>custom-lite-transformation-xd</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
