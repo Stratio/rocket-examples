@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.stratio.connectors.ssccsdk</groupId>
             <artifactId>sscc-commons-${connectors.sscc.binary.version}_${scala.binary.version}</artifactId>
-            <version>${connectors.sscc-commons.version}</version>
+            <version>${connectors.sscc.commons.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
