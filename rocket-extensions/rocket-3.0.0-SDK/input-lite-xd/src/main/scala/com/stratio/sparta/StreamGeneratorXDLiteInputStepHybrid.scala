@@ -31,4 +31,14 @@ class StreamGeneratorXDLiteInputStepHybrid(
     ResultHybridData(dataFrame)
   }
 
+  // This method is used in order to provide an equivalent Batch Dataframe for debugging purposes
+  def debugInit(): Option[DataFrame] = {
+    import xdSession.implicits._
+
+    Option(Seq(
+      (8, "Lazarillo de Tormes"),
+      (64, "Codex Seraphinianus"),
+      (27, "Divina Commedia")
+    ).toDF("price", "book"))
+  }
 }
