@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    © 2017 Stratio Big Data Inc., Sucursal en España. All rights reserved.
+    This software – including all its source code – contains proprietary information of Stratio Big Data Inc., Sucursal en España and may not be revealed, sold, transferred, modified, distributed or otherwise made available, licensed or sublicensed to third parties; nor reverse engineered, disassembled or decompiled, without express written authorization from Stratio Big Data Inc., Sucursal en España.
+    Usage:
+        In order to use xml properly, log4j 2 Mapping Diagnosis Context (MDC) keys must be replaced by proper key name (the one used inside project to set MDC property value)
+        Example:
+            Considering a project that sets MDC properties using these keys: [user, audit, process, data-json], these replacements must be executed over xml file
+                - sed -i -e 's/\[MDC_USER_KEY\]/user/g' log4j2.xml
+                - sed -i -e 's/\[MDC_AUDIT_KEY\]/audit/g' log4j2.xml
+                - sed -i -e 's/\[MDC_PROCESS_KEY\]/process/g' log4j2.xml
+                - sed -i -e 's/\[MDC_DATA-JSON_KEY\]/data-json/g' log4j2.xml
+
+-->
+<Configuration monitorInterval="30">
+    <Properties>
+        <Property name="formattedJsonPatternCentralizedLogging">
+            %d{yyyy-MM-dd'T'HH:mm:ss.SSS}%replace{%d{XXX}}{^Z$}{+00:00} %level %replace{%X{[MDC_USER_KEY]}}{^.{0}$}{-} %replace{%X{[MDC_AUDIT_KEY]}}{^.{0}$}{0} %replace{%X{[MDC_PROCESS_KEY]}}{^.{0}$}{-} %c %encode{%m}{CRLF}%n
+        </Property>
+        <Property name="unformattedJsonPatternCentralizedLogging">
+            %d{yyyy-MM-dd'T'HH:mm:ss.SSS}%replace{%d{XXX}}{^Z$}{+00:00} %level %replace{%X{[MDC_USER_KEY]}}{^.{0}$}{-} %replace{%X{[MDC_AUDIT_KEY]}}{^.{0}$}{0} %replace{%X{[MDC_PROCESS_KEY]}}{^.{0}$}{-} %c {"@message":"Unformatted message. Provided log has been added to @data","@data": %encode{%m}{CRLF},"@exception":"%enc{%throwable}{JSON}"}%n
+        </Property>
+        <Property name="commonPatternCentralizedLogging">
+            %d{yyyy-MM-dd'T'HH:mm:ss.SSS}%replace{%d{XXX}}{^Z$}{+00:00} %level %replace{%X{[MDC_USER_KEY]}}{^.{0}$}{-} %replace{%X{[MDC_AUDIT_KEY]}}{^.{0}$}{0} %replace{%X{[MDC_PROCESS_KEY]}}{^.{0}$}{-} %c {"@message":"%enc{%m}{JSON}","@data":%replace{%X{[MDC_DATA-JSON_KEY]}}{^.{0}$}{{}},"@exception":"%enc{%throwable}{JSON}"}%n
+        </Property>
+        <Property name="basePattern">
+            %level | %d{dd-MM-yyyy HH:mm:ss,SSS} | %c | %encode{%m}{CRLF}%n
+        </Property>
+    </Properties>
+    <Scripts>
+        <Script name="messageSelectorCentralizedLogging" language="javascript"><![CDATA[
+            var result = "Common";
+            try {
+                var originalMessage = logEvent.getMessage().getFormattedMessage();
+                var stringMessage = typeof originalMessage !== "string" ? JSON.stringify(originalMessage) : originalMessage;
+                var message = JSON.parse(stringMessage);
+                if (typeof message === "object" && message !== null) {
+                    if (message.hasOwnProperty("@message")) {
+                        result = "FormattedJSON";
+                    } else {
+                        result = "UnformattedJSON";
+                    }
+                }
+            } catch (e) {
+                result = "Common";
+            }
+            result;
+            ]]>
+        </Script>
+    </Scripts>
+    <Appenders>
+        <Console name="stderrCentralizedJSONLogging" target="SYSTEM_ERR">
+            <PatternLayout>
+                <ScriptPatternSelector alwaysWriteExceptions="false">
+                    <ScriptRef ref="messageSelectorCentralizedLogging"/>
+                    <PatternMatch key="FormattedJSON">
+                        <Pattern>${formattedJsonPatternCentralizedLogging}</Pattern>
+                    </PatternMatch>
+                    <PatternMatch key="UnformattedJSON">
+                        <Pattern>${unformattedJsonPatternCentralizedLogging}</Pattern>
+                    </PatternMatch>
+                    <PatternMatch key="Common">
+                        <Pattern>${commonPatternCentralizedLogging}</Pattern>
+                    </PatternMatch>
+                </ScriptPatternSelector>
+            </PatternLayout>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+        <Console name="stdoutCentralizedJSONLogging" target="SYSTEM_OUT">
+            <PatternLayout alwaysWriteExceptions="false">
+                <ScriptPatternSelector>
+                    <ScriptRef ref="messageSelectorCentralizedLogging"/>
+                    <PatternMatch key="FormattedJSON">
+                        <Pattern>${formattedJsonPatternCentralizedLogging}</Pattern>
+                    </PatternMatch>
+                    <PatternMatch key="UnformattedJSON">
+                        <Pattern>${unformattedJsonPatternCentralizedLogging}</Pattern>
+                    </PatternMatch>
+                    <PatternMatch key="Common">
+                        <Pattern>${commonPatternCentralizedLogging}</Pattern>
+                    </PatternMatch>
+                </ScriptPatternSelector>
+            </PatternLayout>
+            <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT"/>
+        </Console>
+        <Console name="stdoutCentralizedLogging" target="SYSTEM_OUT">
+            <PatternLayout alwaysWriteExceptions="false">
+                <Pattern>${formattedJsonPatternCentralizedLogging}</Pattern>
+            </PatternLayout>
+            <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT"/>
+        </Console>
+        <Console name="stderrDevelopmentLogging" target="SYSTEM_ERR">
+            <PatternLayout alwaysWriteExceptions="true">
+                <Pattern>${basePattern}</Pattern>
+            </PatternLayout>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+        <Console name="stdoutDevelopmentLogging" target="SYSTEM_OUT">
+            <PatternLayout alwaysWriteExceptions="true">
+                <Pattern>${basePattern}</Pattern>
+            </PatternLayout>
+            <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="ACCEPT"/>
+        </Console>
+        <Async name="stdoutAsync">
+            <AppenderRef ref="stdoutCentralizedJSONLogging"/>
+        </Async>
+    </Appenders>
+    <Loggers>
+        <Root level="${env:SERVICE_LOG_LEVEL:-INFO}">
+            <AppenderRef ref="stdoutAsync"/>
+            <AppenderRef ref="stderrCentralizedJSONLogging"/>
+        </Root>
+        <Logger name="com.stratio.sparta" level="${env:SPARTA_LOG_LEVEL:-INFO}"/>
+        <Logger name="com.stratio.rocket" level="${env:SPARTA_LOG_LEVEL:-INFO}"/>
+    </Loggers>
+</Configuration>
