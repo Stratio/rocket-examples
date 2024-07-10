@@ -1,4 +1,4 @@
-FROM qa.int.stratio.com/stratio/analytic-environment:4.0.0-SNAPSHOT as build
+FROM qa.int.stratio.com/stratio/analytic-environment:4.0.0-SNAPSHOT
 
 # *******************************************************************************************
 #                                   ===> GPU <===

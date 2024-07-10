@@ -116,5 +116,5 @@ RUN pip install --no-cache-dir \
 
 # => Pre-creating Mlflow managed virtual environments
 RUN mkdir /mlflow-environment
-COPY ./rocket_images_extension/tensorflow_spark/image_customization_files/mlflow_venv/conda.yaml /mlflow-environment/conda.yaml
+COPY ./mlflow_venv/conda.yaml /mlflow-environment/conda.yaml
 RUN python -c 'from mlflow.utils.conda import get_or_create_conda_env; get_or_create_conda_env("/mlflow-environment/conda.yaml")'
