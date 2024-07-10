@@ -1,0 +1,120 @@
+FROM qa.int.stratio.com/stratio/rocket-driver:3.4.0-SNAPSHOT
+
+# *******************************************************************************************
+#                                   ===> GPU <===
+#                                -----------------------
+#                  Install nvidia and cuda dependencies and configuration to be used with GPU
+#                  Install Horovod Distributed Deep Learning dependencies and configuration
+#
+# *******************************************************************************************
+
+# => From https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.8.0/ubuntu2204/base/Dockerfile
+ENV NVARCH x86_64
+ENV NV_CUDA_CUDART_VERSION 11.8.89-1
+ENV NV_CUDA_COMPAT_PACKAGE cuda-compat-11-8
+ENV CUDA_VERSION 11.8.0
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates \
+    && curl -fsSLO https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/${NVARCH}/cuda-keyring_1.0-1_all.deb \
+    && dpkg -i cuda-keyring_1.0-1_all.deb \
+    && rm -rf /var/lib/apt/lists/*
+
+# For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        cuda-cudart-11-8=${NV_CUDA_CUDART_VERSION} \
+        ${NV_CUDA_COMPAT_PACKAGE} \
+    && rm -rf /var/lib/apt/lists/*
+
+# Required for nvidia-docker v1
+RUN echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
+    && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf
+
+ENV PATH /usr/local/cuda-11.8/lib64:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/cuda-11.8/lib64:${LD_LIBRARY_PATH}
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+
+# => From https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.8.0/ubuntu2204/runtime/Dockerfile
+
+ENV NV_CUDA_LIB_VERSION 11.8.0-1
+ENV NV_NVTX_VERSION 11.8.86-1
+ENV NV_LIBNPP_VERSION 11.8.0.86-1
+ENV NV_LIBNPP_PACKAGE libnpp-11-8=${NV_LIBNPP_VERSION}
+ENV NV_LIBCUSPARSE_VERSION 11.7.5.86-1
+
+ENV NV_LIBCUBLAS_PACKAGE_NAME libcublas-11-8
+ENV NV_LIBCUBLAS_VERSION 11.11.3.6-1
+ENV NV_LIBCUBLAS_PACKAGE ${NV_LIBCUBLAS_PACKAGE_NAME}=${NV_LIBCUBLAS_VERSION}
+
+ENV NV_LIBNCCL_PACKAGE_NAME libnccl2
+ENV NV_LIBNCCL_PACKAGE_VERSION 2.15.5-1
+ENV NCCL_VERSION 2.15.5-1
+ENV NV_LIBNCCL_PACKAGE ${NV_LIBNCCL_PACKAGE_NAME}=${NV_LIBNCCL_PACKAGE_VERSION}+cuda11.8
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-libraries-11-8=${NV_CUDA_LIB_VERSION} \
+    ${NV_LIBNPP_PACKAGE} \
+    cuda-nvtx-11-8=${NV_NVTX_VERSION} \
+    libcusparse-11-8=${NV_LIBCUSPARSE_VERSION} \
+    ${NV_LIBCUBLAS_PACKAGE} \
+    ${NV_LIBNCCL_PACKAGE} \
+    && rm -rf /var/lib/apt/lists/*
+
+# Keep apt from auto upgrading the cublas and nccl packages. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
+RUN apt-mark hold ${NV_LIBCUBLAS_PACKAGE_NAME} ${NV_LIBNCCL_PACKAGE_NAME}
+
+# => From https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/11.8.0/ubuntu2204/runtime/cudnn8/Dockerfile
+
+ENV NV_CUDNN_VERSION 8.9.0.131
+ENV NV_CUDNN_PACKAGE_NAME "libcudnn8"
+ENV NV_CUDNN_PACKAGE "libcudnn8=$NV_CUDNN_VERSION-1+cuda11.8"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ${NV_CUDNN_PACKAGE} \
+    && apt-mark hold ${NV_CUDNN_PACKAGE_NAME} \
+    && rm -rf /var/lib/apt/lists/*
+
+# - S.O apps. and libraries
+RUN apt-get -qq update \
+    && apt-get install -y -qq --no-install-recommends \
+        # - Horovod pre-requisites
+        # cmake
+        cmake \
+        # gcc and g++
+        gcc=4:11.2.0-1ubuntu1 \
+        g++=4:11.2.0-1ubuntu1 \
+        # OpenMpi
+        openmpi-bin=4.1.2-2ubuntu1 libopenmpi-dev=4.1.2-2ubuntu1 \
+#    # · Cleaning
+    && apt-get -qq clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN conda install -c conda-forge libstdcxx-ng=12
+
+#  => Setting LD_LIBRARY_PATH
+ENV PATH /usr/local/cuda-11.8/lib64:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/cuda-11.8/lib64:${LD_LIBRARY_PATH}
+
+RUN conda install -c conda-forge libstdcxx-ng=12 nvcc_linux-64 cudatoolkit-dev
+
+RUN pip install --no-cache-dir \
+        mlflow==2.13.0 \
+        tensorflow==2.12.0 \
+        tensorflow-io==0.25.0 \
+        typing_extensions==4.10.0 \
+        spark-tensorflow-distributor==1.0.0 \
+        scikit-build==0.16.3 \
+        pyarrow==12.0.1 \
+        petastorm==0.12.1 \
+        torch==2.0.1 torchvision==0.15.2 && \
+        HOROVOD_WITH_GLOO=1 HOROVOD_WITH_MPI=1 HOROVOD_WITH_TENSORFLOW=1 HOROVOD_WITH_PYTORCH=1 pip install horovod[tensorflow,pytorch]==0.28.1 && \
+        rm -rf ~/.cache/pip
+
+# => Pre-creating Mlflow managed virtual environments
+RUN mkdir /mlflow-environment
+COPY ./mlflow_venv/conda.yaml /mlflow-environment/conda.yaml
+RUN python -c 'from mlflow.utils.conda import get_or_create_conda_env; get_or_create_conda_env("/mlflow-environment/conda.yaml")'
