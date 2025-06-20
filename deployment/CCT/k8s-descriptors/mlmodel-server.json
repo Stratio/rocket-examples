@@ -1,0 +1,1603 @@
+{
+  "parentConfiguration": {
+    "serviceName": "stratiobase",
+    "model": "default",
+    "version": "14.8.0-SNAPSHOT"
+  },
+  "data": {
+    "serviceName": "mlmodel-server",
+    "model": "default",
+    "version": "14.8.0-SNAPSHOT",
+    "displayServiceName": "ML Model Server",
+    "description": "Example to deploy Rocket ML Model services. Deploy prediction servers with or without Rocket API, is possible to provide serialized model artifacts from ULRs or included in the docker images on local path.",
+    "framework": false,
+    "highAvailability": false,
+    "container": {
+      "runners": [
+        {
+          "typeClass": "com.stratio.tais.persistence.model.service.container.DockerRunner",
+          "image": "${modelDockerImage}",
+          "forcePullImage": false,
+          "privileged": false
+        }
+      ],
+      "volumes": []
+    },
+    "networking": {
+      "expose": [],
+      "network": {
+        "networkType": "user",
+        "ports": [
+          {
+            "id": "tcp_mlmodel",
+            "servicePort": 8080,
+            "protocol": "tcp",
+            "name": "mlmodel",
+            "labels": {},
+            "containerPort": 8080
+          }
+        ],
+        "requirePorts": false
+      }
+    },
+    "resources": [
+      "Cpu(request ${general.resources.CPUs}, limit ${dynamicCpuLimit})",
+      "Mem(request ${general.resources.MEM}, limit ${dynamicMemLimit})"
+    ],
+    "probes": [
+      "K8sLivenessCommand(command ['/prediction-server/healthcheck.sh'], periodSeconds ${general.probes.livenessProbePeriodSeconds}, failureThreshold ${general.probes.livenessProbeFailureThreshold}, timeoutSeconds ${general.probes.livenessProbeTimeoutSeconds}, successThreshold 1, terminationGracePeriodSeconds 30)",
+      "K8sReadinessCommand(command ['/prediction-server/healthcheck.sh'], periodSeconds ${general.probes.readinessProbePeriodSeconds}, failureThreshold ${general.probes.readinessProbeFailureThreshold}, timeoutSeconds ${general.probes.readinessProbeTimeoutSeconds}, successThreshold 1)",
+      "K8sStartupCommand(command ['/prediction-server/healthcheck.sh'], periodSeconds ${general.probes.startupProbePeriodSeconds}, failureThreshold ${general.probes.startupProbeFailureThreshold}, timeoutSeconds ${general.probes.startupProbeTimeoutSeconds}, successThreshold 1, terminationGracePeriodSeconds 30)"
+    ],
+    "secrets": {
+      "appRole": "role",
+      "secretRole": "${approlename}"
+    },
+    "dependencies": [],
+    "permissions": {
+      "enabled": true,
+      "policies": [
+        "K8sSingleRole(id ${Application.name}, apiGroups [''], resources [configmaps], verbs [get, list, watch])",
+        "K8sServiceAccount(id ${Application.name}, role ${Application.name})"
+      ]
+    },
+    "constraints":[
+      {
+        "id": "mlModelServerPlacements",
+        "title": "ML Model MServer placements",
+        "description": "Placements for every Rocket ML Model server instance",
+        "query": {
+          "name": "*"
+        },
+        "required": false,
+        "primary": true
+      }
+    ],
+    "priorities": [
+      {
+        "id": "application",
+        "title": "Rocket MlModel server priority class",
+        "primary": true,
+        "required": false,
+        "defaultValue": "applications-normal"
+      }
+    ]
+  },
+  "parameters": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "general": {
+        "type": "object",
+        "additionalProperties": false,
+        "ui": {
+          "component": "standard"
+        },
+        "name": "general",
+        "title": "General",
+        "description": "Tab to configure the ML Model service deployment.",
+        "properties": {
+          "serviceId": {
+            "description": "Final path given to the service being deployed",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "application": true,
+            "internalName": "SERVICE_ID",
+            "ui": {
+              "updatable": false
+            },
+            "title": "ML Model service name",
+            "default": "mlmodel-service",
+            "pattern": "^[a-z]([-a-z0-9]*[a-z0-9])?$",
+            "maxLength": 55
+          },
+          "modelDockerImage": {
+            "description": "The docker image used to deploy the model server.",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "application": true,
+            "level": 1,
+            "internalName": "MLMODEL_DOCKER_IMAGE",
+            "title": "Docker image",
+            "default": "${eos.dockerRegistry}/rocket-ml-prediction-server:3.6.0-SNAPSHOT"
+          },
+          "provideArtifactsStrategy": {
+            "description": "Indicates how the Rocket ML Model and extensions are to be obtained. Using Rocket API, external file server indicating the URLs or using a Docker image containing the serialized model on a local path.",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "PROVIDE_ARTIFACTS_STRATEGY",
+            "ui": {
+              "updatable": false
+            },
+            "enum": [
+              "EXTERNAL_URLS",
+              "LOCAL",
+              "ROCKET_API"
+            ],
+            "default": "EXTERNAL_URLS",
+            "title": "Provide artifacts (model and extensions) strategy"
+          },
+          "rocketApiModelUrl": {
+            "description": "Rocket API model URL used for download the serialized object.",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "ROCKET_API_MODEL_URL",
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "provideArtifactsStrategy": "ROCKET_API"
+              }
+            },
+            "examples": [
+              "https://<rocket_url>:7777/mlModels/serialization/download/${modelId}?serLib=${serializationLibrary}&libVersion=${serializationLibraryVersion}"
+            ],
+            "default": "",
+            "title": "Rocket API URL"
+          },
+          "modelId": {
+            "description": "Model id used for download the serialized model when using Rocket API.",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "MODEL_ID",
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "provideArtifactsStrategy": "ROCKET_API"
+              }
+            },
+            "default": "",
+            "title": "Model id"
+          },
+          "rocketModelUrls": {
+            "description": "List of URL files used for download the serialized objects into /models path.",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "ROCKET_MODEL_URLS",
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "provideArtifactsStrategy": "EXTERNAL_URLS"
+              }
+            },
+            "default": "",
+            "title": "Model serialized object URLs (comma separated list)"
+          },
+          "unzipModel": {
+            "description": "Unzip serialized model object. MLeap serializations don't need to be unzipped. When the serialized model is provided locally o downloaded from URLs, is possible than this action is not necessary.",
+            "type": "boolean",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "UNZIP_MODEL",
+            "ui": {
+              "updatable": false
+            },
+            "default": true,
+            "title": "Unzip Model (Needed in MLFlow serializations zipped)"
+          },
+          "serializationLibrary": {
+            "description": "Serialization library used in training process.",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "SERIALIZATION_LIBRARY",
+            "ui": {
+              "updatable": false
+            },
+            "enum": [
+              "mlflowproject",
+              "mleap",
+              "rocketAutoMl"
+            ],
+            "default": "mlflowproject",
+            "title": "Serialization library"
+          },
+          "serializationLibraryVersion": {
+            "description": "Serialization library version used in training process.",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "SERIALIZATION_LIBRARY_VERSION",
+            "ui": {
+              "updatable": false
+            },
+            "default": "",
+            "title": "Serialization library version"
+          },
+          "virtualEnvManagement": {
+            "type": "object",
+            "additionalProperties": false,
+            "ui": {
+              "component": "accordion",
+              "visible": {
+                "serializationLibrary": "mlflowproject"
+              }
+            },
+            "name": "virtualEnvManagement",
+            "title": "Virtual environment management",
+            "description": "Configures the virtual environment where the MLflow prediction server will run",
+            "properties": {
+              "virtualEnvManagementMode": {
+                "description": "Virtual environment management mode",
+                "type": "string",
+                "required": true,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "VIRTUAL_ENVIRONMENT_MANAGEMENT_MODE",
+                "ui": {
+                  "updatable": false
+                },
+                "enum": [
+                  "MLflowManaged",
+                  "CondaYamlDescriptor",
+                  "ActivateCondaEnv",
+                  "ActivateCondaPackEnv",
+                  "CondaPackExtensionManaged"
+                ],
+                "default": "MLflowManaged",
+                "title": "Virtual environment management mode"
+              },
+              "activateCondaEnv": {
+                "description": "Name or path of Conda environment to activate",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CONDA_ENVIRONMENT_IDENTIFIER",
+                "ui": {
+                  "updatable": false,
+                  "visible": {
+                    "virtualEnvManagementMode": "ActivateCondaEnv"
+                  }
+                },
+                "default": "",
+                "title": "Name or path of Conda environment to activate"
+              },
+              "activateCondaPackEnvByPath": {
+                "description": "Path of Conda-pack environment to activate",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CONDA_PACK_ENVIRONMENT_PATH",
+                "ui": {
+                  "updatable": false,
+                  "visible": {
+                    "virtualEnvManagementMode": "ActivateCondaPackEnv"
+                  }
+                },
+                "default": "",
+                "title": "Path of Conda-pack environment to activate"
+              },
+              "condaYamlDescriptor": {
+                "description": "Conda.yaml in base64 format; this descriptor will be replaced the one included in MLflow's model",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "EXPLICIT_CONDA_YAML_B64",
+                "ui": {
+                  "updatable": false,
+                  "visible": {
+                    "virtualEnvManagementMode": "CondaYamlDescriptor"
+                  }
+                },
+                "default": "",
+                "title": "Conda environment descriptor (conda.yaml) in base64 format"
+              },
+              "condaPackExtensionManagedRocketApiUrl": {
+                "description": "Rocket URL for downloading a virtual environment extension",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CONDA_PACK_EXTENSION_ROCKET_API_URL",
+                "ui": {
+                  "updatable": false,
+                  "visible": {
+                    "virtualEnvManagementMode": "CondaPackExtensionManaged",
+                    "provideArtifactsStrategy": "ROCKET_API"
+                  }
+                },
+                "default": "",
+                "title": "Rocket URL for a downloading virtual environment extension"
+              },
+              "condaPackExtensionManagedExternalUrl": {
+                "description": "URL for downloading a virtual environment extension",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CONDA_PACK_EXTENSION_URL",
+                "ui": {
+                  "updatable": false,
+                  "visible": {
+                    "virtualEnvManagementMode": "CondaPackExtensionManaged",
+                    "provideArtifactsStrategy": "EXTERNAL_URLS"
+                  }
+                },
+                "default": "",
+                "title": "URL for downloading a virtual environment extension"
+              },
+              "executeCondaUnpack": {
+                "description": "Execute conda-unpack command after environment activation",
+                "type": "boolean",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CONDA_PACK_EXTENSION_EXEC_CONDA_UNPACK",
+                "title": "Execute conda-unpack command after environment activation",
+                "default": true,
+                "ui": {
+                  "updatable": true,
+                  "visible": {
+                    "virtualEnvManagementMode": "CondaPackExtensionManaged"
+                  }
+                }
+              },
+              "pythonExtensionsUrls": {
+                "description": "List of URL files used for download python extensions *.py, *.zip or *.egg",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "PYTHON_EXTENSIONS_URLS",
+                "ui": {
+                  "updatable": true
+                },
+                "default": "",
+                "title": "Python extensions (*.py, *.zip or *.egg) URLs (comma separated list)"
+              }
+            },
+            "required": [
+            ]
+          },
+          "serverPort": {
+            "description": "Internal server port.",
+            "type": "integer",
+            "required": false,
+            "readOnly": true,
+            "application": false,
+            "level": 2,
+            "internalName": "PORT0",
+            "ui": {
+              "updatable": false
+            },
+            "default": 8080,
+            "title": "Server port"
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": false,
+            "ui": {
+              "component": "accordion"
+            },
+            "name": "resources",
+            "title": "Resources",
+            "description": "",
+            "properties": {
+              "INSTANCES": {
+                "description": "Instances for the service",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "INSTANCES",
+                "title": "Instances",
+                "default": 1
+              },
+              "cpuResourceType": {
+                "description": "Kubernetes CPU resource type: guaranteed/hard/soft limits. Guaranteed -> request equal to limit. Hard -> limit can be greater than request. Soft -> No limit",
+                "type": "string",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "CPU_RESOURCE_TYPE",
+                "title": "CPU resource type",
+                "ui": {
+                  "visible": {
+                    "advancedcct": true
+                  }
+                },
+                "enum": [
+                  "Guaranteed",
+                  "Hard",
+                  "Soft"
+                ],
+                "default": "Soft"
+              },
+              "CPUs": {
+                "description": "CPUs request for the service",
+                "type": "number",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "CPUs",
+                "title": "CPUs Request",
+                "default": 1
+              },
+              "cpuLimit": {
+                "description": "CPUs limit for the service",
+                "type": "number",
+                "required": false,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "CPU_LIMIT",
+                "title": "CPUs Limit",
+                "ui": {
+                  "visible": {
+                    "cpuResourceType": "Hard",
+                    "advancedcct": true
+                  }
+                },
+                "default": 1
+              },
+              "memResourceType": {
+                "description": "Kubernetes Memory resource type: guaranteed/hard/soft limits. Guaranteed -> request equal to limit. Hard -> limit can be greater than request. Soft -> No limit",
+                "type": "string",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "MEM_RESOURCE_TYPE",
+                "title": "Memory resource type",
+                "ui": {
+                  "visible": {
+                    "advancedcct": true
+                  }
+                },
+                "enum": [
+                  "Guaranteed",
+                  "Hard",
+                  "Soft"
+                ],
+                "default": "Guaranteed"
+              },
+              "MEM": {
+                "description": "Memory request for the service",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "MEM",
+                "title": "Memory request (MB)",
+                "default": 1024
+              },
+              "memLimit": {
+                "description": "Memory limit for the service",
+                "type": "integer",
+                "required": false,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "internalName": "MEMORY_LIMIT",
+                "title": "Memory limit (MB)",
+                "ui": {
+                  "visible": {
+                    "memResourceType": "Hard",
+                    "advancedcct": true
+                  }
+                }
+              },
+              "moreresources": {
+                "type": "object",
+                "additionalProperties": false,
+                "ui": {
+                  "component": "show-more"
+                },
+                "name": "moreresources",
+                "title": "",
+                "description": "Section to configure JVM properties",
+                "properties": {
+                  "javaInitialRamPercentage": {
+                    "description": "Initial size of the Java heap as a percentage (0 - 100) of the total memory available to the VM (relevant to server and workers). Corresponding to '-XX:InitialRAMPercentage'. Default 25.0",
+                    "type": "string",
+                    "required": false,
+                    "readOnly": false,
+                    "application": false,
+                    "level": 1,
+                    "internalName": "JAVA_INITIAL_RAM_PERCENTAGE",
+                    "title": "Initial size of the Java heap as a percentage (applies to server and workers)",
+                    "default": "-XX:InitialRAMPercentage=25.0"
+                  },
+                  "javaMaxRamPercentage": {
+                    "description": "Maximum size of the Java heap as a percentage (0 - 100) of the total memory available to the VM (relevant to server and workers). Corresponding to '-XX:MaxRAMPercentage'. Default 85.0",
+                    "type": "string",
+                    "required": false,
+                    "readOnly": false,
+                    "application": false,
+                    "level": 1,
+                    "internalName": "JAVA_MAX_RAM_PERCENTAGE",
+                    "title": "Maximum size of the Java heap as a percentage (applies to server and workers)",
+                    "default": "-XX:MaxRAMPercentage=85.0"
+                  }
+                },
+                "required": []
+              },
+              "DISK": {
+                "description": "Disk for the service",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 2,
+                "internalName": "DISK",
+                "title": "Disk",
+                "default": 0
+              }
+            },
+            "required": [
+              "INSTANCES",
+              "CPUs",
+              "MEM",
+              "DISK"
+            ]
+          },
+          "probes": {
+            "type": "object",
+            "additionalProperties": false,
+            "ui": {
+              "component": "accordion",
+              "visible": {
+                "advancedcct": true
+              }
+            },
+            "name": "probes",
+            "title": "Probes",
+            "description": "Probes configuration for service",
+            "properties": {
+              "startupProbePeriodSeconds": {
+                "description": "Startup probe periodSeconds",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "STARTUP_PROBE_PERIOD_SECONDS",
+                "title": "Startup probe periodSeconds",
+                "default": 5
+              },
+              "startupProbeFailureThreshold": {
+                "description": "Startup probe failureThreshold",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "STARTUP_PROBE_FAILURE_THRESHOLD",
+                "title": "Startup probe failureThreshold",
+                "default": 120
+              },
+              "startupProbeTimeoutSeconds": {
+                "description": "Startup probe timeoutSeconds",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "STARTUP_PROBE_TIMEOUT_SECONDS",
+                "title": "Startup probe timeoutSeconds",
+                "default": 5
+              },
+              "livenessProbePeriodSeconds": {
+                "description": "Liveness probe periodSeconds",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "LIVENESS_PROBE_PERIOD_SECONDS",
+                "title": "Liveness probe periodSeconds",
+                "default": 30
+              },
+              "livenessProbeFailureThreshold": {
+                "description": "Liveness probe failureThreshold",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "LIVENESS_PROBE_FAILURE_THRESHOLD",
+                "title": "Liveness probe failureThreshold",
+                "default": 3
+              },
+              "livenessProbeTimeoutSeconds": {
+                "description": "Liveness probe timeoutSeconds",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "LIVENESS_PROBE_TIMEOUT_SECONDS",
+                "title": "Liveness probe timeoutSeconds",
+                "default": 15
+              },
+              "readinessProbePeriodSeconds": {
+                "description": "Readiness probe periodSeconds",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "READINESS_PROBE_PERIOD_SECONDS",
+                "title": "Readiness probe periodSeconds",
+                "default": 30
+              },
+              "readinessProbeFailureThreshold": {
+                "description": "Readiness probe failureThreshold",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "READINESS_PROBE_FAILURE_THRESHOLD",
+                "title": "Readiness probe failureThreshold",
+                "default": 3
+              },
+              "readinessProbeTimeoutSeconds": {
+                "description": "Readiness probe timeoutSeconds",
+                "type": "integer",
+                "required": true,
+                "readOnly": false,
+                "application": true,
+                "level": 1,
+                "ui": {
+                  "updatable": true,
+                  "visible": true
+                },
+                "internalName": "READINESS_PROBE_TIMEOUT_SECONDS",
+                "title": "Readiness probe timeoutSeconds",
+                "default": 15
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      },
+      "security": {
+        "type": "object",
+        "additionalProperties": false,
+        "ui": {
+          "component": "standard"
+        },
+        "name": "security",
+        "title": "Security",
+        "description": "",
+        "properties": {
+          "securityEnable": {
+            "description": "Whether to enable security",
+            "type": "boolean",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 2,
+            "internalName": "SECURITY_ENABLED",
+            "title": "Security enabled",
+            "default": true
+          },
+          "encryptionEnable": {
+            "description": "Whether to enable encryption policies in Vault or not",
+            "type": "boolean",
+            "required": true,
+            "readOnly": false,
+            "application": true,
+            "internalName": "VAULT_ENCRYPTION_ENABLE",
+            "title": "Vault policies encryption enabled",
+            "default": false
+          },
+          "vaultEnable": {
+            "description": "Security of Vault enabled.",
+            "type": "boolean",
+            "required": false,
+            "readOnly": true,
+            "application": false,
+            "level": 2,
+            "internalName": "VAULT_ENABLE",
+            "ui": {
+              "updatable": false
+            },
+            "title": "Vault enabled",
+            "default": true
+          },
+          "vaultHosts": {
+            "description": "Host list where vault is configured.",
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 3,
+            "required": false,
+            "readOnly": true,
+            "application": false,
+            "level": 2,
+            "internalName": "VAULT_HOSTS",
+            "ui": {
+              "updatable": false
+            },
+            "default": "${globals.vault.vaultHost}",
+            "title": "Vault hosts"
+          },
+          "vaultPort": {
+            "description": "Port to reach vault.",
+            "type": "integer",
+            "minimum": 1,
+            "required": false,
+            "readOnly": true,
+            "application": false,
+            "level": 2,
+            "internalName": "VAULT_PORT",
+            "ui": {
+              "updatable": false
+            },
+            "title": "Vault port",
+            "default": "${globals.vault.vaultPort}"
+          },
+          "vaultProtocol": {
+            "description": "Vault protocol.",
+            "type": "string",
+            "minimum": 1,
+            "required": false,
+            "readOnly": true,
+            "application": false,
+            "level": 2,
+            "internalName": "VAULT_PROTOCOL",
+            "ui": {
+              "updatable": false
+            },
+            "title": "Vault protocol",
+            "default": "https"
+          },
+          "approlename": {
+            "description": "Vault AppRole.",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "application": false,
+            "level": 2,
+            "internalName": "VAULT_ROLE",
+            "ui": {
+              "updatable": false
+            },
+            "title": "Vault AppRole",
+            "default": "${Application.domain}-${Application.name}"
+          },
+          "serviceAccountName": {
+            "description": "Service account used to deploy",
+            "type": "string",
+            "required": true,
+            "readOnly": true,
+            "level": 2,
+            "ui": {
+              "updatable": false
+            },
+            "application": false,
+            "internalName": "SERVICE_ACCOUNT_NAME",
+            "title": "Service account name",
+            "default": "fieldRef:spec.serviceAccountName:v1"
+          },
+          "assetIdentity": {
+            "description": "Asset identity",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "level": 1,
+            "ui": {
+              "updatable": false
+            },
+            "application": false,
+            "internalName": "ASSET_IDENTITY",
+            "title": "Asset identity",
+            "default": ""
+          },
+          "identityVaultPath": {
+            "description": "Vault path",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "level": 1,
+            "ui": {
+              "updatable": false
+            },
+            "application": false,
+            "internalName": "ASSET_IDENTITY_VAULT_PATH",
+            "title": "Asset identity Vault path",
+            "default": "${assetIdentity}.${Application.domain}"
+          },
+          "assetIdentityAlternativeSecretBundle": {
+            "description": "Asset identity alternative secret bundle",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "level": 1,
+            "ui": {
+              "updatable": false
+            },
+            "application": true,
+            "internalName": "ASSET_IDENTITY_ALTERNATIVE_SECRET_BUNDLE",
+            "title": "Asset identity alternative secret bundle",
+            "default": "${assetIdentity}-${Application.domain}"
+          },
+          "identityVaultCluster": {
+            "description": "Vault cluster",
+            "type": "string",
+            "required": true,
+            "readOnly": false,
+            "level": 1,
+            "ui": {
+              "updatable": false
+            },
+            "application": false,
+            "internalName": "IDENTITY_VAULT_CLUSTER_NAME",
+            "title": "Identity vault cluster",
+            "default": "userland"
+          },
+          "useDynamicAuthentication": {
+            "description": "Whether or not use dynamic authentication.",
+            "type": "boolean",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 2,
+            "internalName": "USE_DYNAMIC_AUTHENTICATION",
+            "ui": {
+              "updatable": false
+            },
+            "title": "Use dynamic authentication",
+            "default": true
+          },
+          "securityTlsEnable": {
+            "description": "Use TLS security",
+            "type": "boolean",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "MICROSERVICE_TLS_ENABLED",
+            "ui": {
+              "updatable": false
+            },
+            "title": "Enable TLS security",
+            "default": true
+          },
+          "validateClientCert": {
+            "description": "Validate client cert",
+            "type": "boolean",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 1,
+            "internalName": "MICROSERVICE_TLS_VALIDATE_CLIENT_CERT",
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "securityTlsEnable": true
+              }
+            },
+            "title": "Validate client cert",
+            "default": true
+          },
+          "useCABundleLegacyOnly": {
+            "description": "Whether or not to enforce legacy CA bundle retrieval. When set to `false`it will fallback to legacy mode if the new CABundle file is not found.",
+            "type": "boolean",
+            "required": false,
+            "readOnly": false,
+            "application": false,
+            "level": 2,
+            "internalName": "CABUNDLE_LEGACY_PATH_ONLY",
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "securityTlsEnable": true
+              }
+            },
+            "title": "Only use legacy CA bundle retrieval",
+            "default": true
+          },
+          "condaCert": {
+            "description": "Conda certificate",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "level": 2,
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "securityTlsEnable": true
+              }
+            },
+            "application": false,
+            "internalName": "CONDA_SSL_VERIFY",
+            "title": "Conda certificate",
+            "default": "/miniconda/ssl/cacert.pem"
+          },
+          "pipCert": {
+            "description": "Pip certificate",
+            "type": "string",
+            "required": false,
+            "readOnly": false,
+            "level": 2,
+            "ui": {
+              "updatable": false,
+              "visible": {
+                "securityTlsEnable": true
+              }
+            },
+            "application": false,
+            "internalName": "PIP_CERT",
+            "title": "Pip certificate",
+            "default": "/miniconda/ssl/cacert.pem"
+          },
+          "Conda": {
+            "type": "object",
+            "additionalProperties": false,
+            "ui": {
+              "component": "accordion"
+            },
+            "name": "Conda",
+            "title": "Conda",
+            "description": "Tab to configure Conda",
+            "properties": {
+              "condaOfflineEnabled": {
+                "description": "Conda offline enabled",
+                "type": "boolean",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "ROCKET_CONDA_OFFLINE_ENABLED",
+                "ui": {
+                  "updatable": false
+                },
+                "title": "Conda offline enabled",
+                "default": false
+              },
+              "condaIndexUrls": {
+                "description": "Environment variable (csv) with the url of the Conda channels",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "ROCKET_CONDA_EXTRA_REPO_URLS",
+                "title": "Conda channels (urls)",
+                "default": ""
+              },
+              "condaIndexVaultPaths": {
+                "description": "Environment variable (csv) with the vault paths containing the secrets of the Conda channels",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "ROCKET_CONDA_EXTRA_REPO_VAULT_PATHS",
+                "title": "Conda Repositories (vault paths)",
+                "default": ""
+              },
+              "condaLogLevel": {
+                "description": "Log level of conda.",
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 3,
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CONDA_VERBOSITY",
+                "title": "Conda log level",
+                "enum": [
+                  "0",
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "default": "0"
+              }
+            }
+          },
+          "Pypi": {
+            "type": "object",
+            "additionalProperties": false,
+            "ui": {
+              "component": "accordion"
+            },
+            "name": "Pypi repositories",
+            "title": "Pypi repositories",
+            "description": "Tab to configure connection to external Pypi repositories",
+            "properties": {
+              "pypiExtraIndexUrls": {
+                "description": "Environment variable (csv) with the url of the PyPI repositories. Please, replace the default (https://pypi.org/simple) to work offline",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "ROCKET_PIP_EXTRA_REPO_URLS",
+                "title": "Pip Repositories (urls)",
+                "default": "https://pypi.org/simple"
+              },
+              "pypiExtraIndexVaultPaths": {
+                "description": "Environment variable (csv) with the vault paths containing the secrets of the PyPI repositories",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "ROCKET_PIP_EXTRA_REPO_VAULT_PATHS",
+                "title": "Pip Repositories (vault paths)",
+                "default": ""
+              }
+            }
+          },
+          "Calico": {
+            "type": "object",
+            "additionalProperties": false,
+            "ui": {
+              "component": "accordion"
+            },
+            "name": "calico",
+            "title": "Calico Network",
+            "description": "Use Calico security to this Rocket instance",
+            "properties": {
+              "calicoEnabled": {
+                "description": "Whether or not enable the Calico security.",
+                "type": "boolean",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "level": 1,
+                "internalName": "CALICO_ENABLED",
+                "title": "Use calico",
+                "default": false
+              },
+              "calicoNetwork": {
+                "description": "Name of the calico network where Rocket and the workflows are deployed if calico security is enabled. It uses the same value of Network name.",
+                "type": "string",
+                "required": false,
+                "readOnly": false,
+                "application": false,
+                "default": "keos",
+                "level": 1,
+                "internalName": "CALICO_NETWORK",
+                "ui": {
+                  "visible": {
+                    "calicoEnabled": true
+                  }
+                },
+                "title": "Calico network"
+              }
+            },
+            "required": []
+          }
+        },
+        "required": [
+          "approlename",
+          "serviceAccountName",
+          "assetIdentity",
+          "identityVaultCluster",
+          "identityVaultPath"
+        ]
+      }
+    }
+  },
+  "lifecycles": {
+    "install": {
+      "start": [
+        {
+          "type": "core/disable",
+          "tag": "gosec-register",
+          "enabled": "false"
+        },
+        {
+          "label": "Print install start log",
+          "type": "io/print",
+          "text": "Lifecycle: Install/start"
+        },
+        {
+          "label": "Init resources interpolation log",
+          "type": "io/print",
+          "text": "------------- Instance resources interpolation --------------"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Guaranteed",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Guaranteed'}",
+          "value": "${general.resources.CPUs}"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Hard",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Hard'}",
+          "value": "${general.resources.cpuLimit}"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Soft",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Soft'}",
+          "value": null
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Guaranteed",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Guaranteed'}",
+          "value": "${general.resources.MEM}"
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Hard",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Hard'}",
+          "value": "${general.resources.memLimit}"
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Soft",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Soft'}",
+          "value": null
+        },
+        {
+          "type": "switch",
+          "expression": "${advancedcct}",
+          "cases": [
+            {
+              "key": true,
+              "tasks": [
+                {
+                  "label": "set priority classes environment variables from wizard values",
+                  "type": "io/print",
+                  "text": "------------- Set priority classes environment variables from wizard values -------------"
+                },
+                {
+                  "name": "Application",
+                  "label": "Set MODEL_PRIORITY_CLASS_NAME env. variable to the value set in the wizard",
+                  "type": "model/parameter/upsert",
+                  "application": "#{Application}",
+                  "parameterName": "modelAssetPriorityClass",
+                  "internalName": "MODEL_PRIORITY_CLASS_NAME",
+                  "value": "${priority.mlmodel.name}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Init secrets creation log",
+          "type": "io/print",
+          "text": "------------- Instance secrets creation --------------"
+        },
+        {
+          "type": "kubernetes/customresource/create",
+          "apiVersion": "secrets.stratio.com/v2beta1",
+          "kind": "SecretsIdentity",
+          "plural": "SecretsIdentities",
+          "name": "${Application.name}",
+          "namespace": "${Application.domain}",
+          "spec": "{\"enableDataEncryption\": ${encryptionEnable},\"bundles\":[{\"name\":\"${Application.name}\"},{\"name\":\"${assetIdentity}\"},{\"name\":\"${assetIdentityAlternativeSecretBundle}\"}],\"subject\":{\"kind\":\"ServiceAccount\",\"name\":\"${Application.name}\",\"namespace\":\"${Application.domain}\"}}",
+          "enabled": "true"
+        },
+        {
+          "type": "time/sleep",
+          "millis": "10000"
+        }
+      ],
+      "install/pre": [
+        {
+          "label": "Print install pre task log",
+          "type": "io/print",
+          "text": "Printing install pre task log"
+        }
+      ],
+      "install/post": [
+        {
+          "label": "Print install post task log",
+          "type": "io/print",
+          "text": "Printing install post task log"
+        }
+      ],
+      "install/finalize": [
+        {
+          "label": "Print install finalize task log",
+          "type": "io/print",
+          "text": "Printing install finalize task log"
+        }
+      ],
+      "finish": [
+        {
+          "label": "Print install finish log",
+          "type": "io/print",
+          "text": "Printing install finish log"
+        }
+      ]
+    },
+    "update": {
+      "start": [
+        {
+          "label": "Print update start log",
+          "type": "io/print",
+          "text": "Printing update start log"
+        },
+        {
+          "label": "Init resources interpolation log",
+          "type": "io/print",
+          "text": "------------- Instance resources interpolation --------------"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Guaranteed",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Guaranteed'}",
+          "value": "${general.resources.CPUs}"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Hard",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Hard'}",
+          "value": "${general.resources.cpuLimit}"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Soft",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Soft'}",
+          "value": null
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Guaranteed",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Guaranteed'}",
+          "value": "${general.resources.MEM}"
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Hard",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Hard'}",
+          "value": "${general.resources.memLimit}"
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Soft",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Soft'}",
+          "value": null
+        },
+        {
+          "type": "switch",
+          "expression": "${advancedcct}",
+          "cases": [
+            {
+              "key": true,
+              "tasks": [
+                {
+                  "label": "set priority classes environment variables from wizard values",
+                  "type": "io/print",
+                  "text": "------------- Set priority classes environment variables from wizard values -------------"
+                },
+                {
+                  "name": "Application",
+                  "label": "Set MODEL_PRIORITY_CLASS_NAME env. variable to the value set in the wizard",
+                  "type": "model/parameter/upsert",
+                  "application": "#{Application}",
+                  "parameterName": "modelAssetPriorityClass",
+                  "internalName": "MODEL_PRIORITY_CLASS_NAME",
+                  "value": "${priority.mlmodel.name}"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "update/pre": [
+        {
+          "label": "Print update pre task log",
+          "type": "io/print",
+          "text": "Printing update pre task log"
+        }
+      ],
+      "update/post": [
+        {
+          "label": "Print update post task log",
+          "type": "io/print",
+          "text": "Printing update post task log"
+        }
+      ],
+      "update/finalize": [
+        {
+          "label": "Print update finalize task log",
+          "type": "io/print",
+          "text": "Printing update finalize task log"
+        }
+      ],
+      "finish": [
+        {
+          "label": "Print update finish log",
+          "type": "io/print",
+          "text": "Printing update finish log"
+        }
+      ]
+    },
+    "upgrade": {
+      "start": [
+        {
+          "label": "Print upgrade start log",
+          "type": "io/print",
+          "text": "Printing upgrade start log"
+        },
+        {
+          "label": "Init resources interpolation log",
+          "type": "io/print",
+          "text": "------------- Instance resources interpolation --------------"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Guaranteed",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Guaranteed'}",
+          "value": "${general.resources.CPUs}"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Hard",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Hard'}",
+          "value": "${general.resources.cpuLimit}"
+        },
+        {
+          "name": "Interpolation dynamic CpuLimit Soft",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicCpuLimit",
+          "internalName": "DYNAMIC_CPU_LIMIT",
+          "enabled": "${'${general.resources.cpuResourceType}' == 'Soft'}",
+          "value": null
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Guaranteed",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Guaranteed'}",
+          "value": "${general.resources.MEM}"
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Hard",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Hard'}",
+          "value": "${general.resources.memLimit}"
+        },
+        {
+          "name": "Interpolation dynamic MemLimit Soft",
+          "type": "model/parameter/upsert",
+          "application": "#{Application}",
+          "parameterName": "dynamicMemLimit",
+          "internalName": "DYNAMIC_MEM_LIMIT",
+          "enabled": "${'${general.resources.memResourceType}' == 'Soft'}",
+          "value": null
+        }
+      ],
+      "upgrade/pre": [
+        {
+          "label": "Print upgrade pre task log",
+          "type": "io/print",
+          "text": "Printing upgrade pre task log"
+        }
+      ],
+      "upgrade/post": [
+        {
+          "label": "Print upgrade post task log",
+          "type": "io/print",
+          "text": "Printing upgrade post task log"
+        }
+      ],
+      "upgrade/finalize": [
+        {
+          "label": "Print upgrade finalize task log",
+          "type": "io/print",
+          "text": "Printing upgrade finalize task log"
+        }
+      ],
+      "finish": [
+        {
+          "label": "Print upgrade finish log",
+          "type": "io/print",
+          "text": "Printing upgrade finish log"
+        }
+      ]
+    },
+    "restart": {
+      "start": [
+        {
+          "label": "Print restart start log",
+          "type": "io/print",
+          "text": "Printing restart start log"
+        }
+      ],
+      "restart/pre": [
+        {
+          "label": "Print restart pre task log",
+          "type": "io/print",
+          "text": "Printing restart pre task log"
+        }
+      ],
+      "restart/post": [
+        {
+          "label": "Print restart post task log",
+          "type": "io/print",
+          "text": "Printing restart post task log"
+        }
+      ],
+      "restart/finalize": [
+        {
+          "label": "Print restart finalize task log",
+          "type": "io/print",
+          "text": "Printing restart finalize task log"
+        }
+      ],
+      "finish": [
+        {
+          "label": "Print restart finish log",
+          "type": "io/print",
+          "text": "Printing restart finish log"
+        }
+      ]
+    },
+    "uninstall": {
+      "start": [
+        {
+          "label": "Print uninstall start log",
+          "type": "io/print",
+          "text": "Printing uninstall start log"
+        }
+      ],
+      "uninstall/pre": [
+        {
+          "label": "Print uninstall pre task log",
+          "type": "io/print",
+          "text": "Printing uninstall pre task log"
+        }
+      ],
+      "uninstall/post": [
+        {
+          "label": "Print uninstall post task log",
+          "type": "io/print",
+          "text": "Printing uninstall post task log"
+        }
+      ],
+      "uninstall/finalize": [
+        {
+          "label": "Print uninstall finalize task log",
+          "type": "io/print",
+          "text": "Printing uninstall finalize task log"
+        }
+      ],
+      "finish": [
+        {
+          "label": "Print uninstall finish log",
+          "type": "io/print",
+          "text": "Printing uninstall finish log"
+        }
+      ]
+    }
+  }
+}
