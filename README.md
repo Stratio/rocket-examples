@@ -113,6 +113,6 @@ Lastly, in order to use the newly registered UDF you just need to call it in a T
 ## Built With
 * [Maven](https://maven.apache.org/) - Dependency Management
 
-## Exploiting an MLModel
+## Using CCT Descriptors to Deploy and Exploit an MLModel
 
 You can deploy the microservice either from the Stratio Rocket interface or by deploying the service with another tool or application. If you choose to deploy it without using the Stratio Rocket interface, the lifecycle of the executions will be handled by the deployment tool. For example, Stratio makes it possible to deploy this service through Stratio Command Center, where there is the option to deploy an MLModel Server in the application marketplace. For reference, an example deployment descriptor is available at deployment/CCT/k8s-descriptors/mlmodel-server.json
