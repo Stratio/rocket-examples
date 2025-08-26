@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.stratio.rocket.poc</groupId>
+    <artifactId>rocket-synapseml</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <scala.binary.version>2.12</scala.binary.version>
+        <apache.spark.version>3.1.1</apache.spark.version>
+        <junit.version>4.13.1</junit.version>
+        <scalatest.version>2.2.5</scalatest.version>
+        <rocket.version>3.0.0-SNAPSHOT</rocket.version>
+        <crossdata.version>3.4.0-M6</crossdata.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>mmlspark.azureedge.net/</id>
+            <name>mmlspark.azureedge.net/</name>
+            <url>https://mmlspark.azureedge.net/maven</url>
+        </repository>
+        <repository>
+            <id>spark-packages</id>
+            <name>spark-packages</name>
+            <url>https://repos.spark-packages.org</url>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+
+        <!-- ********************************************** -->
+        <!-- Spark dependencies                             -->
+        <!-- ********************************************** -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
+            <version>${apache.spark.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
+            <version>${apache.spark.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_2.12</artifactId>
+            <version>${apache.spark.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ********************************************** -->
+        <!-- Rocket dependencies                            -->
+        <!-- ********************************************** -->
+
+        <dependency>
+            <groupId>com.stratio.sparta</groupId>
+            <artifactId>sdk-lite-xd</artifactId>
+            <version>${rocket.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.stratio.crossdata</groupId>
+            <artifactId>crossdata-core_${scala.binary.version}</artifactId>
+            <version>${crossdata.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.stratio.sparta</groupId>
+            <artifactId>rocket-ml-client</artifactId>
+            <version>3.1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.stratio.sparta</groupId>
+            <artifactId>ml-pipeline-core</artifactId>
+            <version>3.1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.stratio.sparta</groupId>
+            <artifactId>core</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-core_${scala.binary.version}</artifactId>
+            <version>3.6.10</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ********************************************** -->
+        <!-- Microsoft SynapseMl                            -->
+        <!-- ********************************************** -->
+
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>synapseml_2.12</artifactId>
+            <version>0.9.5-13-d1b51517-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-reflect</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-tags_2.12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-avro_2.12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest_2.12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-azure</artifactId>
+            <version>3.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <configuration>
+                    <checkMultipleScalaVersions>false</checkMultipleScalaVersions>
+                    <recompileMode>incremental</recompileMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                            <goal>doc</goal>
+                            <goal>doc-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>rocket-synapseml</finalName>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <minimizeJar>false</minimizeJar>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <exclude>log4j2.xml</exclude>
+                                <exclude>log4j.properties</exclude>
+                                <exclude>logback.xml</exclude>
+                                <exclude>**/Log4j2Plugins.dat</exclude>
+                                <exclude>**/models/*.json</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>classworlds:classworlds</exclude>
+                            <exclude>junit:junit</exclude>
+                            <exclude>jmock:*</exclude>
+                            <exclude>*:xml-apis</exclude>
+                            <exclude>org.apache.maven:lib:tests</exclude>
+                            <exclude>com.fasterxml.jackson.*</exclude>
+                            <exclude>org.scala-lang</exclude>
+                            <exclude>org.slf4j</exclude>
+                        </excludes>
+                    </artifactSet>
+
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
