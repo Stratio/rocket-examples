@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# · Install conda 26.5.3 (embedded Python 3.14), the same as rocket-builder
+# · Install conda 26.9.4 (embedded Python 3.14), the same as rocket-builder and rocket-docker-base
 CONDA_DIR=/opt/conda
-CONDA_VERSION=py314_26.5.3-2-Linux-x86_64
+CONDA_VERSION=py314_26.9.4-0-Linux-x86_64
 
 curl -LO https://repo.anaconda.com/miniconda/Miniconda3-$CONDA_VERSION.sh
 mkdir -p $CONDA_DIR
