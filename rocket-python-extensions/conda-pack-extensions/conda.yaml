@@ -5,4 +5,4 @@ channels:
   - nodefaults
 
 dependencies:
-  - python=3.9.7
+  - python=3.14.6

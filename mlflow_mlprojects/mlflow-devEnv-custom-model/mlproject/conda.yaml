@@ -7,13 +7,14 @@ name: test
 
 # Conda channels (repositories) used to retrieve python packages
 channels:
-  - defaults
+  - conda-forge
+  - nodefaults
 
 # Dependencies
 dependencies:
   # From conda repositories (channels)
-  - python=3.7.6
-  - pip=20.2.2 # <-- pip: python package manager
+  - python=3.14.6
+  - pip=25.0.1 # <-- pip: python package manager
   - pip:
       # Python packages managed with Pip instead of Conda
-      - mlflow==1.15.0
+      - mlflow==3.13.0

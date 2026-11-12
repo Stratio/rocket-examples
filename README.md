@@ -2,7 +2,7 @@
 This project is aimed at facilitating  any developer the implementation of their own Sparta plugins or Rocket extensions through showing examples of each kind of step. The repository features all the functionalities included in our SDK. Our main goal is, that implementing any custom plugin becomes as easy as developing a workflow.
 
 ## Getting Started
-Before get going you must first `clone` this repository. Bear in mind that all the examples available in this repository were developed using Intellij IDE with `Scala 2.12`.
+Before get going you must first `clone` this repository. Bear in mind that all the examples available in this repository were developed using Intellij IDE with `Scala 2.12`, except `rocket-extensions/rocket-4.2.0-SDK`, built with `Scala 2.13`, Spark 4.2.0 and Java 17.
 
 ### Installing
 

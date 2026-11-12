@@ -37,3 +37,7 @@
 
 - rocket-3.0.0-SDK  
     - New functionality: Hybrid custom steps
+
+- rocket-4.2.0-SDK  
+    - Same steps as rocket-3.0.0-SDK built for Spark 4.2.0, Scala 2.13 and Java 17
+    - Lineage and QRs: `sscc-rocket` 1.2.0-M1 and Pekko instead of `sscc-commons` and Akka

@@ -58,7 +58,7 @@ def main(argv):
     """ Tracking """
     with mlflow.start_run() as run:
         print('MFlown run {}'.format(run.info))
-        mlflow.pyfunc.log_model("model", python_model=model, signature=signature)
+        mlflow.pyfunc.log_model(name="model", python_model=model, signature=signature)
 
 
 if __name__ == '__main__':

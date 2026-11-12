@@ -1,13 +1,23 @@
-artifact_path: model
 flavors:
   python_function:
-    cloudpickle_version: 2.0.0
-    env: conda.yaml
+    cloudpickle_version: 3.1.2
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
     loader_module: mlflow.pyfunc.model
     python_model: python_model.pkl
-    python_version: 3.7.6
-run_id: c874e2ead8864acaa377d6252e03277b
+    python_version: 3.14.6
+    streamable: false
+is_signature_from_type_hint: false
+mlflow_version: 3.13.0
+model_id: null
+model_size_bytes: 206
+model_uuid: 0e41e28f2a4440408ca14ce60c423d04
+prompts: null
 signature:
-  inputs: '[{"name": "class", "type": "string"}]'
-  outputs: '[{"name": "prediction", "type": "string"}]'
-utc_time_created: '2021-10-27 08:13:47.929231'
+  inputs: '[{"type": "string", "name": "class", "required": true}]'
+  outputs: '[{"type": "string", "name": "prediction", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-10-01 18:19:38.385298'

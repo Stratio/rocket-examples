@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 #
 # © 2017 Stratio Big Data Inc., Sucursal en España. All rights reserved.
 #
@@ -35,7 +35,7 @@ def setup_package():
         install_requires=[],
         version="0.1.0",
         keywords=['Rocket', 'Python'],
-        classifiers=['Programming Language :: Python :: 3.7'],
+        classifiers=['Programming Language :: Python :: 3.14'],
     )
 
     setup(**metadata)

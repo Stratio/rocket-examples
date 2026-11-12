@@ -6,11 +6,11 @@ wd = os.path.abspath(os.path.dirname(__file__))
 
 # => Setting spark environment ~ Rocket integration
 if not os.getenv('SPARK_HOME'):
-    os.environ['SPARK_HOME'] = "/home/asoriano/workspace/software/stratio-spark-distribution-3.1.1-1.2.0-766b881-bin"
+    os.environ['SPARK_HOME'] = "XXXXXXXXXXX"
 spark_home = os.environ.get('SPARK_HOME', None)
 # Add pyspark and py4j to path.
 sys.path.insert(0, spark_home + "/python")
-sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.10.9-src.zip'))
+sys.path.insert(0, os.path.join(spark_home, 'python/lib/py4j-0.10.9.9-src.zip'))
 
 from pyspark.sql import SparkSession
 import mlflow
